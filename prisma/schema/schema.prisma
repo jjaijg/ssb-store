@@ -1,0 +1,23 @@
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters", "prismaSchemaFolder"]
+}
+
+generator markdown {
+  provider = "prisma-markdown"
+  output   = "./ERD.md"
+  title    = "SSB Store"
+}
+
+generator zod {
+  provider          = "prisma-zod-generator"
+  output            = "./generated-zod-schemas"
+  isGenerateSelect  = true
+  isGenerateInclude = true
+}
