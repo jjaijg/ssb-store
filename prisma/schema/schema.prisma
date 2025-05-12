@@ -1,12 +1,11 @@
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters", "prismaSchemaFolder"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 generator markdown {
@@ -16,8 +15,6 @@ generator markdown {
 }
 
 generator zod {
-  provider          = "prisma-zod-generator"
-  output            = "./generated-zod-schemas"
-  isGenerateSelect  = true
-  isGenerateInclude = true
+  provider = "prisma-zod-generator"
+  // output   = "./generated-zod-schemas"
 }
