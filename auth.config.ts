@@ -7,13 +7,13 @@ export const authConfig = {
     async authorized({ request, auth }) {
       // Array of regex of paths to protect
       const protectedPaths: RegExp[] = [
-        // /\/shipping-address/,
-        // /\/payment-method/,
-        // /\/place-order/,
-        // /\/profile/,
-        // /\/user\/(.*)/,
-        // /\/order\/(.*)/,
-        // /\/admin/,
+        /\/shipping-address/,
+        /\/payment-method/,
+        /\/place-order/,
+        /\/profile/,
+        /\/user\/(.*)/,
+        /\/order\/(.*)/,
+        /\/admin/,
       ];
 
       // Get pathname from the req url object

@@ -10,8 +10,8 @@ export const config = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
-    signIn: "/auth/signin", // Custom sign-in page
-    error: "/auth/signin", // when any error, redirec to signin page
+    signIn: "/signin", // Custom sign-in page
+    error: "/signin", // when any error, redirec to signin page
   },
   adapter: PrismaAdapter(prisma) as NextAuthConfig["adapter"],
   providers: [
@@ -55,20 +55,31 @@ export const config = {
     }),
   ],
   callbacks: {
-    async session({ session, token }) {
-      // Attach user ID and role to the session
-      if (session?.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+    async jwt({ token, user, trigger, session }) {
+      // handle session update
+      // when user updates their profile
+      if (session?.user.name && trigger === "update") {
+        token.name = session.user.name;
       }
-      return session;
-    },
-    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
       }
       return token;
+    },
+    async session({ session, token, trigger, user }) {
+      // Attach user ID and role to the session
+      if (session?.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
+      // Update session user name if it exists
+      // and the trigger is "update" via the jwt callback
+      // This is useful when the user updates their profile
+      if (trigger === "update") {
+        session.user.name = user.name;
+      }
+      return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
