@@ -13,8 +13,3 @@ generator markdown {
   output   = "./ERD.md"
   title    = "SSB Store"
 }
-
-generator zod {
-  provider = "prisma-zod-generator"
-  // output   = "./generated-zod-schemas"
-}
