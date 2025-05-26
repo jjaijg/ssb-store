@@ -26,6 +26,46 @@ erDiagram
   DateTime createdAt
   DateTime updatedAt
 }
+"Product" {
+  String id PK
+  String name
+  String slug UK
+  String description "nullable"
+  String categoryId FK
+  String brandId FK
+  Status status
+  Boolean isFeatured
+  String bannerImage "nullable"
+  Decimal rating
+  Int ratingCount
+  String metaTitle "nullable"
+  String metaDescription "nullable"
+  String tags
+  String createdBy "nullable"
+  String updatedBy "nullable"
+  DateTime createdAt
+  DateTime updatedAt
+}
+"ProductVariant" {
+  String id PK
+  String productId FK
+  String variantName
+  String unit
+  Decimal value
+  Decimal price
+  Int stock
+  String sku UK
+  Boolean isActive
+  Boolean isDefault
+  String barcode UK "nullable"
+  Int minOrderQty
+  Int maxOrderQty "nullable"
+  String images
+  DiscountType discountType "nullable"
+  Decimal discountValue "nullable"
+  DateTime createdAt
+  DateTime updatedAt
+}
 "User" {
   String id PK
   String name "nullable"
@@ -71,6 +111,9 @@ erDiagram
   DateTime createdAt
   DateTime updatedAt
 }
+"Product" }o--|| "Category" : category
+"Product" }o--|| "Brand" : brand
+"ProductVariant" }o--|| "Product" : product
 "Account" }o--|| "User" : user
 "Session" }o--|| "User" : user
 ```
@@ -96,6 +139,50 @@ erDiagram
   - `description`: 
   - `logoUrl`: 
   - `updatedby`: 
+  - `createdAt`: 
+  - `updatedAt`: 
+
+### `Product`
+
+**Properties**
+  - `id`: 
+  - `name`: 
+  - `slug`: 
+  - `description`: 
+  - `categoryId`: 
+  - `brandId`: 
+  - `status`: 
+  - `isFeatured`: 
+  - `bannerImage`: 
+  - `rating`: 
+  - `ratingCount`: 
+  - `metaTitle`: 
+  - `metaDescription`: 
+  - `tags`: 
+  - `createdBy`: 
+  - `updatedBy`: 
+  - `createdAt`: 
+  - `updatedAt`: 
+
+### `ProductVariant`
+
+**Properties**
+  - `id`: 
+  - `productId`: 
+  - `variantName`: 
+  - `unit`: 
+  - `value`: 
+  - `price`: 
+  - `stock`: 
+  - `sku`: 
+  - `isActive`: 
+  - `isDefault`: 
+  - `barcode`: 
+  - `minOrderQty`: 
+  - `maxOrderQty`: 
+  - `images`: 
+  - `discountType`: 
+  - `discountValue`: 
   - `createdAt`: 
   - `updatedAt`: 
 

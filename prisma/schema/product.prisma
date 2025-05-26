@@ -8,7 +8,7 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // products  Product[] // One-to-many
+  products Product[] // One-to-many
 }
 
 model Brand {
@@ -21,5 +21,68 @@ model Brand {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // products  Product[]
+  products Product[]
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String?
+  categoryId      String
+  brandId         String
+  status          Status   @default(ACTIVE)
+  isFeatured      Boolean  @default(false)
+  bannerImage     String?
+  rating          Decimal  @default(0) @db.Decimal(3, 2)
+  ratingCount     Int      @default(0)
+  metaTitle       String?
+  metaDescription String?
+  tags            String[] @default([])
+  createdBy       String? // Track who created the product
+  updatedBy       String? // Track who last updated the product
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  category Category         @relation(fields: [categoryId], references: [id])
+  brand    Brand            @relation(fields: [brandId], references: [id])
+  variants ProductVariant[]
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([status])
+  @@index([isFeatured])
+}
+
+model ProductVariant {
+  id            String        @id @default(cuid())
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId     String
+  variantName   String
+  unit          String
+  value         Decimal       @default(0) @db.Decimal(12, 2)
+  price         Decimal       @default(0) @db.Decimal(12, 2)
+  stock         Int           @default(0)
+  sku           String        @unique
+  isActive      Boolean       @default(true)
+  isDefault     Boolean       @default(false)
+  barcode       String?       @unique
+  minOrderQty   Int           @default(1)
+  maxOrderQty   Int?          @default(100)
+  images        String[]      @default([])
+  discountType  DiscountType?
+  discountValue Decimal?      @default(0) @db.Decimal(12, 2)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  DISCONTINUED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
 }
