@@ -4,7 +4,9 @@ import MainNav from "../../components/shared/main-nav";
 
 const links = [
   { label: "Dashboard", href: "/admin/dashboard" },
-  { label: "Products", href: "/admin/Products" },
+  { label: "Brands", href: "/admin/brand" },
+  { label: "Category", href: "/admin/category" },
+  { label: "Products", href: "/admin/products" },
   { label: "Orders", href: "/admin/orders" },
   { label: "Users", href: "/admin/users" },
 ];

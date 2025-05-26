@@ -6,6 +6,26 @@
 ## default
 ```mermaid
 erDiagram
+"Category" {
+  String id PK
+  String name UK
+  String slug UK
+  String description "nullable"
+  String image "nullable"
+  String updatedby "nullable"
+  DateTime createdAt
+  DateTime updatedAt
+}
+"Brand" {
+  String id PK
+  String name UK
+  String slug UK
+  String description "nullable"
+  String logoUrl "nullable"
+  String updatedby "nullable"
+  DateTime createdAt
+  DateTime updatedAt
+}
 "User" {
   String id PK
   String name "nullable"
@@ -54,6 +74,30 @@ erDiagram
 "Account" }o--|| "User" : user
 "Session" }o--|| "User" : user
 ```
+
+### `Category`
+
+**Properties**
+  - `id`: 
+  - `name`: 
+  - `slug`: 
+  - `description`: 
+  - `image`: 
+  - `updatedby`: 
+  - `createdAt`: 
+  - `updatedAt`: 
+
+### `Brand`
+
+**Properties**
+  - `id`: 
+  - `name`: 
+  - `slug`: 
+  - `description`: 
+  - `logoUrl`: 
+  - `updatedby`: 
+  - `createdAt`: 
+  - `updatedAt`: 
 
 ### `User`
 
