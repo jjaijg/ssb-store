@@ -1,49 +1,65 @@
-// import { NextResponse } from "next/server";
 import { NextAuthConfig } from "next-auth";
+import { NextResponse } from "next/server";
+
+// Define protected route patterns
+const PROTECTED_ROUTES = {
+  authenticated: [
+    /^\/profile/,
+    /^\/shipping-address/,
+    /^\/payment-method/,
+    /^\/place-order/,
+    /^\/user\/(.*)/,
+    /^\/order\/(.*)/,
+  ],
+  admin: [/^\/admin\/(.*)/],
+  public: [/^\/signin/, /^\/signup/],
+} as const;
 
 export const authConfig = {
-  providers: [],
+  providers: [], // Providers are configured in auth.ts
+  pages: {
+    signIn: "/signin",
+    error: "/signin",
+  },
   callbacks: {
     async authorized({ request, auth }) {
-      // Array of regex of paths to protect
-      const protectedPaths: RegExp[] = [
-        /\/shipping-address/,
-        /\/payment-method/,
-        /\/place-order/,
-        /\/profile/,
-        /\/user\/(.*)/,
-        /\/order\/(.*)/,
-        /\/admin/,
-      ];
-
-      // Get pathname from the req url object
+      console.log("auth : ", auth);
       const { pathname } = request.nextUrl;
 
-      // check if user is not authenicated & accessing a protected route
-      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
+      // Prevent authenticated users from accessing login/signup pages
+      if (
+        auth &&
+        PROTECTED_ROUTES.public.some((pattern) => pattern.test(pathname))
+      ) {
+        return Response.redirect(new URL("/", request.nextUrl));
+      }
 
-      // Check for cart session cookie
-      //   if (!request.cookies.get("sessionCartId")) {
-      //     // Generate new session cartId cookie
-      //     const sessionCartId = crypto.randomUUID();
+      // Check for authenticated routes
+      const isProtectedRoute = PROTECTED_ROUTES.authenticated.some((pattern) =>
+        pattern.test(pathname)
+      );
 
-      //     // clone request headers
-      //     const newReqHeaders = new Headers(request.headers);
+      // Check for admin routes
+      const isAdminRoute = PROTECTED_ROUTES.admin.some((pattern) =>
+        pattern.test(pathname)
+      );
 
-      //     // create new response and add new headers
-      //     const response = NextResponse.next({
-      //       request: {
-      //         headers: newReqHeaders,
-      //       },
-      //     });
+      // If it's an admin route, check for admin role
+      if (isAdminRoute) {
+        // console.log("Checking admin route:", pathname, auth);
+        // Role is not getting exposed in the auth object
+        // Uncomment the following line if you have a way to access user role in auth
+        // until then each admin page will check the role
+        // return auth?.user.role === "ADMIN";
+        return !!auth;
+      }
 
-      //     // set newly generated sessionCartId in the response cookies
-      //     response.cookies.set("sessionCartId", sessionCartId);
-      //     return response;
-      //   } else {
-      //     return true;
-      //   }
+      // For protected routes, check if user is authenticated
+      if (isProtectedRoute) {
+        return !!auth;
+      }
 
+      // Allow access to public routes
       return true;
     },
   },

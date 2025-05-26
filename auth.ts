@@ -9,10 +9,6 @@ export const config = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  pages: {
-    signIn: "/signin", // Custom sign-in page
-    error: "/signin", // when any error, redirec to signin page
-  },
   adapter: PrismaAdapter(prisma) as NextAuthConfig["adapter"],
   providers: [
     CredentialsProvider({
