@@ -58,7 +58,7 @@ const UserMenu = () => {
           <Avatar
             alt={session.user?.name || "User"}
             src={session.user?.image || ""}
-            sx={{ width: 32, height: 32 }}
+            sx={{ width: 32, height: 32, bgcolor: "primary.main" }}
           >
             {session.user.name?.[0]}
           </Avatar>

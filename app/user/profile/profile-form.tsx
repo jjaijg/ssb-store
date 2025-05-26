@@ -92,16 +92,6 @@ const ProfileForm = (props: Props) => {
           onClose={() => setResult({ success: false, message: "" })}
           message={result.message}
           autoHideDuration={5000}
-          // action={
-          //   <IconButton
-          //     size="small"
-          //     aria-label="close"
-          //     color="inherit"
-          //     onClick={() => setResult({ success: false, message: "" })}
-          //   >
-          //     <CloseIcon fontSize="small" />
-          //   </IconButton>
-          // }
         >
           <Alert
             onClose={() => setResult({ success: false, message: "" })}
