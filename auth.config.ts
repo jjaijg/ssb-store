@@ -23,7 +23,6 @@ export const authConfig = {
   },
   callbacks: {
     async authorized({ request, auth }) {
-      console.log("auth : ", auth);
       const { pathname } = request.nextUrl;
 
       // Prevent authenticated users from accessing login/signup pages
@@ -46,7 +45,6 @@ export const authConfig = {
 
       // If it's an admin route, check for admin role
       if (isAdminRoute) {
-        // console.log("Checking admin route:", pathname, auth);
         // Role is not getting exposed in the auth object
         // Uncomment the following line if you have a way to access user role in auth
         // until then each admin page will check the role

@@ -21,8 +21,9 @@ import {
   TextField,
 } from "@mui/material";
 import { Brand } from "@prisma/client";
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import slugify from "slugify";
 
 type Props = { open: boolean; handleClose: () => void } & (
   | {
@@ -41,7 +42,7 @@ const BrandFormModal = (props: Props) => {
   const [result, setResult] = useState({ success: false, message: "" });
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm({
+  const { watch, ...form } = useForm({
     defaultValues: {
       name: mode === "edit" ? props.brand.name : "",
       slug: mode === "edit" ? props.brand.slug : "",
@@ -52,10 +53,24 @@ const BrandFormModal = (props: Props) => {
     ),
   });
 
+  const name = watch("name");
+
+  useEffect(() => {
+    form.setValue(
+      "slug",
+      slugify(name, {
+        lower: true,
+        strict: true,
+      })
+    );
+  }, [name]);
+
   const handleSubmit = () => {
+    setResult({ success: false, message: "" });
+    if (isPending) return; // Prevent multiple submissions
+
     startTransition(async () => {
       const data = form.getValues();
-      console.log(data);
       let result = {
         success: false,
         message: "",
@@ -81,12 +96,24 @@ const BrandFormModal = (props: Props) => {
       <Dialog
         open={open}
         onClose={handleClose}
-        maxWidth="sm"
         aria-label="brand form modal"
+        slotProps={{
+          paper: {
+            sx: {
+              width: { xs: "90%", sm: "80%", md: "500px" },
+              maxWidth: "500px",
+            },
+          },
+        }}
       >
         <DialogTitle>{mode === "create" ? "Create" : "Edit"} Brand</DialogTitle>
         <DialogContent>
           <Box component={"form"} width={"100%"} mt={2}>
+            {!result.success && result.message && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {result.message}
+              </Alert>
+            )}
             <Stack spacing={2}>
               <TextField
                 fullWidth
@@ -101,7 +128,6 @@ const BrandFormModal = (props: Props) => {
                 label="Slug"
                 type="text"
                 {...form.register("slug")}
-                helperText="Slug will be auto-generated if left empty."
                 autoComplete="off"
                 required
               />
@@ -138,7 +164,7 @@ const BrandFormModal = (props: Props) => {
           </Box>
         </DialogContent>
       </Dialog>
-      {result.message && (
+      {result.success && result.message && (
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           open={Boolean(result.message)}
@@ -148,7 +174,7 @@ const BrandFormModal = (props: Props) => {
         >
           <Alert
             onClose={() => setResult({ success: false, message: "" })}
-            severity={result.success ? "success" : "error"}
+            severity={"success"}
             sx={{ width: "100%" }}
           >
             {result.message}

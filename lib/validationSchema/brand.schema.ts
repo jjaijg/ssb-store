@@ -7,7 +7,7 @@ export const createBrandSchema = z.object({
     .max(30, { message: "Brand name must not exceed 30 characters" }),
   slug: z
     .string()
-    .min(3, { message: "Slug must be at least 3 characters long" })
+    .min(2, { message: "Slug must be at least 3 characters long" })
     .max(50, { message: "Slug must not exceed 50 characters" }),
   description: z
     .string()

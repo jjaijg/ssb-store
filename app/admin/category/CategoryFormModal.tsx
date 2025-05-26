@@ -21,8 +21,9 @@ import {
   TextField,
 } from "@mui/material";
 import { Category } from "@prisma/client";
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import slugify from "slugify";
 
 type Props = { open: boolean; handleClose: () => void } & (
   | {
@@ -41,7 +42,7 @@ const CategoryFormModal = (props: Props) => {
   const [result, setResult] = useState({ success: false, message: "" });
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm({
+  const { watch, ...form } = useForm({
     defaultValues: {
       name: mode === "edit" ? props.category.name : "",
       slug: mode === "edit" ? props.category.slug : "",
@@ -52,10 +53,21 @@ const CategoryFormModal = (props: Props) => {
     ),
   });
 
+  const name = watch("name");
+
+  useEffect(() => {
+    form.setValue(
+      "slug",
+      slugify(name, {
+        lower: true,
+        strict: true,
+      })
+    );
+  }, [name]);
+
   const handleSubmit = () => {
     startTransition(async () => {
       const data = form.getValues();
-      console.log(data);
       let result = {
         success: false,
         message: "",
@@ -81,8 +93,15 @@ const CategoryFormModal = (props: Props) => {
       <Dialog
         open={open}
         onClose={handleClose}
-        maxWidth="sm"
         aria-label="category form modal"
+        slotProps={{
+          paper: {
+            sx: {
+              width: { xs: "90%", sm: "80%", md: "500px" },
+              maxWidth: "500px",
+            },
+          },
+        }}
       >
         <DialogTitle>
           {mode === "create" ? "Create" : "Edit"} Category
