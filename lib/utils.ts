@@ -2,9 +2,15 @@ import { Prisma } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ZodError } from "zod";
+import { TIME_ZONE } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+// shorten the unique id
+export function formatId(id: string) {
+  return `...${id.substring(id.length - 8)}`;
 }
 
 // Format errors
@@ -38,4 +44,39 @@ export function formatError(
   return typeof err.message === "string"
     ? err.message
     : JSON.stringify(err.message);
+}
+
+// Format number
+const NUMBER_FORMATTER = new Intl.NumberFormat("en-IN");
+
+export function formatNumber(number: number) {
+  return NUMBER_FORMATTER.format(number);
+}
+
+// format date & time
+export const dateTimeFormatter = new Intl.DateTimeFormat("en-IN", {
+  timeZone: TIME_ZONE,
+  timeStyle: "medium",
+  dateStyle: "medium",
+});
+export const dateFormatter = new Intl.DateTimeFormat("en-IN", {
+  timeZone: TIME_ZONE,
+  dateStyle: "medium",
+});
+export const timeFormatter = new Intl.DateTimeFormat("en-IN", {
+  timeZone: TIME_ZONE,
+  timeStyle: "medium",
+});
+export function formatDateTiem(dateString: Date | string) {
+  const formattedDateTime: string = dateTimeFormatter.format(
+    new Date(dateString)
+  );
+  const formattedDate: string = dateFormatter.format(new Date(dateString));
+  const formattedTime: string = timeFormatter.format(new Date(dateString));
+
+  return {
+    dateTime: formattedDateTime,
+    dateOnly: formattedDate,
+    timeOnly: formattedTime,
+  };
 }
