@@ -150,3 +150,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.upload-button input[type="file"] {
+  display: none;
+  
+}
