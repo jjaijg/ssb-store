@@ -1,11 +1,12 @@
 import { auth } from "@/auth";
 import { getAllProductsWithVariants } from "@/lib/actions/product.actions";
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box, Fab, Typography } from "@mui/material";
 import React from "react";
 import ProductsTable from "./ProductsTable";
 import { getAllBrandsAction } from "@/lib/actions/brand.actions";
 import { getAllCategoriesAction } from "@/lib/actions/category.actions";
-import CreateProduct from "./CreateProduct";
+import AddIcon from "@mui/icons-material/Add";
+import Link from "next/link";
 
 type Props = {};
 
@@ -37,7 +38,22 @@ const ProductsPage = async (props: Props) => {
       {/* products list */}
       <ProductsTable products={products ?? []} />
       {/* Create Action Button */}
-      <CreateProduct categories={categories} brands={brands} />
+      <Fab
+        LinkComponent={Link}
+        href="/admin/products/create"
+        color="primary"
+        aria-label="add product"
+        size="medium"
+        sx={{
+          position: "fixed",
+          bottom: 28,
+          right: 28,
+          zIndex: 1000,
+        }}
+        title="Create Product"
+      >
+        <AddIcon />
+      </Fab>
     </Box>
   );
 };
