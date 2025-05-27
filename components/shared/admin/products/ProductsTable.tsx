@@ -1,6 +1,7 @@
-import { formatDateTiem, formatId } from "@/lib/utils";
+import { formatId } from "@/lib/utils";
 import {
   Chip,
+  IconButton,
   Paper,
   Stack,
   Table,
@@ -10,9 +11,13 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { Brand, Category, Product, ProductVariant } from "@prisma/client";
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
+import DeleteDialog from "@/components/delete-dialog";
+import { deleteProductById } from "@/lib/actions/product.actions";
 
 type Props = {
   products: (Product & {
@@ -67,6 +72,7 @@ const ProductsTable = ({ products }: Props) => {
               <TableCell>
                 {product.bannerImage ? (
                   <Image
+                    priority
                     src={product.bannerImage}
                     alt={`${product.name} Banner Image`}
                     width={100}
@@ -82,7 +88,9 @@ const ProductsTable = ({ products }: Props) => {
                   <Chip
                     label={`${product.variants.length} Variants`}
                     size="small"
-                    sx={{ margin: "2px" }}
+                    sx={{ margin: "2px", cursor: "pointer" }}
+                    component={Link}
+                    href={`/admin/products/variants/${product.id}`}
                   />
                 ) : (
                   <Chip label="No Variants" size="small" color="warning" />
@@ -90,7 +98,21 @@ const ProductsTable = ({ products }: Props) => {
               </TableCell>
               <TableCell>
                 {/* Actions Buttons - Edit, Delete */}
-                <Stack direction="row" spacing={1}></Stack>
+                <Stack direction="row" spacing={1}>
+                  <IconButton
+                    LinkComponent={Link}
+                    href={`/admin/products/edit/${product.id}`}
+                    color="primary"
+                    aria-label="edit product"
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <DeleteDialog
+                    action={deleteProductById}
+                    id={product.id}
+                    message="Are you sure you want to delete this product? This action cannot be undone."
+                  />
+                </Stack>
               </TableCell>
             </TableRow>
           ))}

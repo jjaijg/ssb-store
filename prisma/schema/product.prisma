@@ -55,25 +55,25 @@ model Product {
 }
 
 model ProductVariant {
-  id            String        @id @default(cuid())
-  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id            String       @id @default(cuid())
+  product       Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId     String
   variantName   String
   unit          String
-  value         Decimal       @default(0) @db.Decimal(12, 2)
-  price         Decimal       @default(0) @db.Decimal(12, 2)
-  stock         Int           @default(0)
-  sku           String        @unique
-  isActive      Boolean       @default(true)
-  isDefault     Boolean       @default(false)
-  barcode       String?       @unique
-  minOrderQty   Int           @default(1)
-  maxOrderQty   Int?          @default(100)
-  images        String[]      @default([])
-  discountType  DiscountType?
-  discountValue Decimal?      @default(0) @db.Decimal(12, 2)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  value         Decimal      @default(0) @db.Decimal(12, 2)
+  price         Decimal      @default(0) @db.Decimal(12, 2)
+  stock         Int          @default(0)
+  sku           String       @unique
+  isActive      Boolean      @default(true)
+  isDefault     Boolean      @default(false)
+  barcode       String?      @unique
+  minOrderQty   Int          @default(1)
+  maxOrderQty   Int?         @default(100)
+  images        String[]     @default([])
+  discountType  DiscountType @default(NONE)
+  discountValue Decimal?     @default(0) @db.Decimal(12, 2)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 enum Status {
@@ -83,6 +83,7 @@ enum Status {
 }
 
 enum DiscountType {
+  NONE
   PERCENTAGE
   FIXED
 }

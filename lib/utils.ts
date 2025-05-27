@@ -80,3 +80,29 @@ export function formatDateTiem(dateString: Date | string) {
     timeOnly: formattedTime,
   };
 }
+
+// Convert prisma object to plain object
+export function convertToPlainObject<T>(value: any): T {
+  return JSON.parse(JSON.stringify(value));
+}
+
+export function serializeDecimal<T>(obj: T): T {
+  const stringify = (value: any) => {
+    if (value instanceof Prisma.Decimal) {
+      return value.toNumber();
+    }
+    return value;
+  };
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => serializeDecimal(item)) as any;
+  }
+
+  if (obj && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key, serializeDecimal(value)])
+    ) as T;
+  }
+
+  return stringify(obj) as T;
+}

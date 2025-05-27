@@ -153,5 +153,8 @@
 
 .upload-button input[type="file"] {
   display: none;
-  
+}
+.upload-button input[type="file"]:disabled ~ label {
+  cursor: not-allowed;
+  opacity: 0.5;
 }

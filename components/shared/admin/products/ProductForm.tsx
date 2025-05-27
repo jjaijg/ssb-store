@@ -1,8 +1,5 @@
 "use client";
-import {
-  createCategoryAction,
-  updateCategoryAction,
-} from "@/lib/actions/category.actions";
+import { updateCategoryAction } from "@/lib/actions/category.actions";
 import { UploadButton } from "@/lib/uploadthing";
 import {
   createProductSchema,
@@ -10,30 +7,35 @@ import {
 } from "@/lib/validationSchema/product.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
   FormControl,
   FormControlLabel,
   FormHelperText,
+  IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
-  Snackbar,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { Brand, Category, Product, Status } from "@prisma/client";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Brand, Category, Status } from "@prisma/client";
 import Image from "next/image";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import slugify from "slugify";
 import { ToastContainer, toast } from "react-toastify";
-import { createProductWithoutVariants } from "@/lib/actions/product.actions";
+import {
+  createProductWithoutVariants,
+  updateProductWithoutVariants,
+} from "@/lib/actions/product.actions";
 import { useRouter } from "next/navigation";
+import { SerializedProduct } from "@/types";
+import { deleteUploadThingFile } from "@/lib/actions/uploadthing.actions";
 
 type Props = {
   categories: Category[];
@@ -45,7 +47,7 @@ type Props = {
   | {
       mode: "edit";
       id: string;
-      product: Product;
+      product: SerializedProduct;
     }
 );
 
@@ -64,6 +66,7 @@ const ProductForm = (props: Props) => {
       brandId: mode === "edit" ? props.product.brandId : "",
       isFeatured: mode === "edit" ? props.product.isFeatured : false,
       status: mode === "edit" ? props.product.status : Status.ACTIVE,
+      bannerImage: mode === "edit" ? props.product.bannerImage ?? "" : "",
     },
     resolver: zodResolver(
       mode === "create" ? createProductSchema : updateProductSchema
@@ -84,6 +87,15 @@ const ProductForm = (props: Props) => {
     );
   }, [name]);
 
+  const handlebannerImageDelete = async () => {
+    if (bannerImage) {
+      // Delete the banner image from the server if needed
+      await deleteUploadThingFile(bannerImage);
+      // Clear the banner image
+      form.setValue("bannerImage", "");
+    }
+  };
+
   const handleSubmit = () => {
     startTransition(async () => {
       const data = form.getValues();
@@ -101,7 +113,11 @@ const ProductForm = (props: Props) => {
           toast.error(result.message || "Failed to create product");
         }
       } else if (mode === "edit") {
-        const result = await updateCategoryAction(props.id, data);
+        const result = await updateProductWithoutVariants(props.id, {
+          ...data,
+          id: props.id,
+          isFeatured: !!data.isFeatured,
+        });
         if (result.success) {
           toast.success("Product updated successfully!");
           form.reset();
@@ -258,7 +274,19 @@ const ProductForm = (props: Props) => {
             </FormControl>
             <FormControlLabel
               sx={{ width: "100%" }}
-              control={<Checkbox {...form.register("isFeatured")} />}
+              control={
+                <Controller
+                  name={"isFeatured"}
+                  control={form.control}
+                  render={({ field: props }) => (
+                    <Checkbox
+                      {...props}
+                      checked={props.value}
+                      onChange={props.onChange}
+                    />
+                  )}
+                />
+              }
               label="Is Featured"
             />
           </Stack>
@@ -280,6 +308,7 @@ const ProductForm = (props: Props) => {
               in the Landing page banners.
             </Typography>
             <UploadButton
+              disabled={isPending || !!bannerImage}
               className="upload-button"
               endpoint={"imageUploader"}
               onClientUploadComplete={(res) => {
@@ -294,13 +323,27 @@ const ProductForm = (props: Props) => {
             />
             <Stack direction="row" spacing={1} mt={2}>
               {bannerImage && (
-                <Image
-                  src={bannerImage}
-                  alt="Banner"
-                  width={"600"}
-                  height={"300"}
-                  style={{ maxWidth: "100%", height: "auto" }}
-                />
+                <Box position={"relative"}>
+                  <Image
+                    src={bannerImage}
+                    alt="Banner"
+                    width={"1024"}
+                    height={"300"}
+                    style={{ maxWidth: "100%", height: "auto" }}
+                  />
+                  <IconButton
+                    color="error"
+                    onClick={handlebannerImageDelete}
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      zIndex: 1,
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
               )}
               {!bannerImage && (
                 <Typography variant="body2" color="textSecondary">

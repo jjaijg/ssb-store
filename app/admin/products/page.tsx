@@ -2,11 +2,15 @@ import { auth } from "@/auth";
 import { getAllProductsWithVariants } from "@/lib/actions/product.actions";
 import { Alert, Box, Fab, Typography } from "@mui/material";
 import React from "react";
-import ProductsTable from "./ProductsTable";
-import { getAllBrandsAction } from "@/lib/actions/brand.actions";
-import { getAllCategoriesAction } from "@/lib/actions/category.actions";
+import ProductsTable from "../../../components/shared/admin/products/ProductsTable";
 import AddIcon from "@mui/icons-material/Add";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Products - Admin",
+  description: "Manage products in the admin panel",
+};
 
 type Props = {};
 
@@ -15,10 +19,6 @@ const ProductsPage = async (props: Props) => {
 
   // Check if the user is authenticated and has the ADMIN role
   if (session?.user.role !== "ADMIN") throw new Error("User is unauthorized");
-
-  //   Fecth categories and brands from the database
-  const { brands = [] } = await getAllBrandsAction();
-  const { categories = [] } = await getAllCategoriesAction();
 
   // Fetch products from the database
   const { success, products } = await getAllProductsWithVariants();

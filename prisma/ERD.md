@@ -61,7 +61,7 @@ erDiagram
   Int minOrderQty
   Int maxOrderQty "nullable"
   String images
-  DiscountType discountType "nullable"
+  DiscountType discountType
   Decimal discountValue "nullable"
   DateTime createdAt
   DateTime updatedAt

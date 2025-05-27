@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import type { DiscountType, Status } from "@prisma/client";
+import { DiscountType, Status } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -113,7 +113,7 @@ const createProducts = async () => {
           stock: 100,
           minOrderQty: 1,
           maxOrderQty: 5,
-          discountType: null,
+          discountType: DiscountType.NONE,
           discountValue: null,
         },
         {
@@ -125,7 +125,7 @@ const createProducts = async () => {
           stock: 50,
           minOrderQty: 1,
           maxOrderQty: 3,
-          discountType: null,
+          discountType: DiscountType.NONE,
           discountValue: null,
         },
       ],
@@ -147,7 +147,7 @@ const createProducts = async () => {
           stock: 200,
           minOrderQty: 1,
           maxOrderQty: 5,
-          discountType: null,
+          discountType: DiscountType.NONE,
           discountValue: null,
         },
       ],
@@ -169,7 +169,7 @@ const createProducts = async () => {
           stock: 100,
           minOrderQty: 1,
           maxOrderQty: 10,
-          discountType: null,
+          discountType: DiscountType.NONE,
           discountValue: null,
         },
         {
@@ -181,7 +181,7 @@ const createProducts = async () => {
           stock: 50,
           minOrderQty: 1,
           maxOrderQty: 5,
-          discountType: null,
+          discountType: DiscountType.NONE,
           discountValue: null,
         },
       ],
@@ -225,7 +225,7 @@ const createProducts = async () => {
           stock: 50,
           minOrderQty: 1,
           maxOrderQty: 5,
-          discountType: null,
+          discountType: DiscountType.NONE,
           discountValue: null,
         },
         {

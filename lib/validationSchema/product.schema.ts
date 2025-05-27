@@ -1,6 +1,35 @@
 import { Status } from "@prisma/client";
 import { z } from "zod";
 
+const validateDefaultVariant = (data: {
+  isActive: boolean;
+  isDefault: boolean;
+}) => {
+  return !(!data.isActive && data.isDefault);
+};
+const validateOrderLimit = (data: {
+  minOrderQty: number;
+  maxOrderQty?: number;
+}) => {
+  if (data.maxOrderQty !== undefined && data.minOrderQty > data.maxOrderQty) {
+    return false;
+  }
+  return true;
+};
+
+const validateDiscount = (data: {
+  discountType: string;
+  discountValue?: number;
+}) => {
+  if (data.discountType === "NONE") {
+    return data.discountValue === undefined || data.discountValue === 0;
+  }
+  if (data.discountType === "PERCENTAGE" || data.discountType === "FIXED") {
+    return data.discountValue !== undefined && data.discountValue > 0;
+  }
+  return false;
+};
+
 export const createProductSchema = z.object({
   name: z
     .string()
@@ -18,7 +47,7 @@ export const createProductSchema = z.object({
   status: z.enum([Status.ACTIVE, Status.DISCONTINUED, Status.INACTIVE], {
     required_error: "Status is required",
   }),
-  bannerImage: z.string().optional(),
+  bannerImage: z.string().url({ message: "Invalid image URL" }).optional(),
   categoryId: z.string().min(1, { message: "Category ID is required" }),
   brandId: z.string().min(1, { message: "Brand ID is required" }),
 });
@@ -28,7 +57,7 @@ export const updateProductSchema = createProductSchema.extend({
 });
 
 // Product variant schema
-export const createProductVariantSchema = z.object({
+export const productVariantSchema = z.object({
   productId: z.string().min(1, { message: "Product ID is required" }),
   variantName: z
     .string()
@@ -38,11 +67,12 @@ export const createProductVariantSchema = z.object({
     .string()
     .min(1, { message: "Unit is required" })
     .max(20, { message: "Unit must not exceed 20 characters" }),
-  value: z.number().positive({
+  value: z.coerce.number().positive({
     message: "Value must be a positive number",
   }),
   images: z
-    .array(z.string().min(1, { message: "Image must be valid" }))
+    .array(z.string().url({ message: "Invalid image URL" }))
+    .min(1, { message: "At least one image is required" })
     .max(5, { message: "You can upload a maximum of 5 images" }),
   isActive: z.boolean().default(true),
   isDefault: z.boolean().default(false),
@@ -50,25 +80,56 @@ export const createProductVariantSchema = z.object({
     .string()
     .min(2, { message: "SKU must be at least 2 characters long" })
     .max(100, { message: "SKU must not exceed 100 characters" }),
-  price: z.number().positive({ message: "Price must be a positive number" }),
-  stock: z.number().int().nonnegative({
+  price: z.coerce
+    .number()
+    .positive({ message: "Price must be a positive number" }),
+  stock: z.coerce.number().int().nonnegative({
     message: "Stock quantity cannot be negative",
   }),
-  minOrderQty: z
+  minOrderQty: z.coerce
     .number()
     .int()
     .nonnegative({ message: "Minimum order quantity cannot be negative" }),
-  maxOrderQty: z
+  maxOrderQty: z.coerce
     .number()
     .int()
     .nonnegative({ message: "Maximum order quantity cannot be negative" }),
-  discountType: z.enum(["PERCENTAGE", "FIXED"]).optional(),
-  discountValue: z
+  discountType: z.enum(["PERCENTAGE", "FIXED", "NONE"]).default("NONE"),
+  discountValue: z.coerce
     .number()
     .nonnegative({ message: "Discount value cannot be negative" })
     .optional(),
 });
 
-export const updateProductVariantSchema = createProductVariantSchema.extend({
-  id: z.string().min(1, { message: "Variant ID is required" }),
-});
+export const createProductVariantSchema = productVariantSchema
+  .refine((data) => validateDefaultVariant(data), {
+    message: "Default variant must be active",
+    path: ["isDefault"],
+  })
+  .refine((data) => validateDiscount(data), {
+    message: "Invalid discount value",
+    path: ["discountValue"],
+  })
+  .refine((data) => validateOrderLimit(data), {
+    message:
+      "Minimum order quantity cannot be greater than maximum order quantity",
+    path: ["minOrderQty"],
+  });
+
+export const updateProductVariantSchema = productVariantSchema
+  .extend({
+    id: z.string().min(1, { message: "Variant ID is required" }),
+  })
+  .refine((data) => validateDefaultVariant(data), {
+    message: "Default variant must be active",
+    path: ["isDefault"],
+  })
+  .refine((data) => validateDiscount(data), {
+    message: "Invalid discount value",
+    path: ["discountValue"],
+  })
+  .refine((data) => validateOrderLimit(data), {
+    message:
+      "Minimum order quantity cannot be greater than maximum order quantity",
+    path: ["minOrderQty"],
+  });

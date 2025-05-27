@@ -15,10 +15,11 @@ import React, { useState, useTransition } from "react";
 
 type Props = {
   id: string;
+  message?: string;
   action: (id: string) => Promise<{ success: boolean; message: string }>;
 };
 
-const DeleteDialog = ({ id, action }: Props) => {
+const DeleteDialog = ({ id, message, action }: Props) => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -38,7 +39,7 @@ const DeleteDialog = ({ id, action }: Props) => {
     <>
       <IconButton
         color="error"
-        aria-label="delete category"
+        aria-label="delete"
         onClick={() => setOpen(true)}
         disabled={isPending}
       >
@@ -48,18 +49,24 @@ const DeleteDialog = ({ id, action }: Props) => {
         <DialogTitle>Are you sure</DialogTitle>
 
         <DialogContent>
-          This action cannot be undone. Do you want to proceed?
+          {message || "This action cannot be undone. Do you want to proceed?"}
         </DialogContent>
 
         <DialogActions>
           <Button
+            variant="outlined"
             onClick={() => setOpen(false)}
             color="primary"
             disabled={isPending}
           >
             Cancel
           </Button>
-          <Button onClick={handleDelete} color="error" disabled={isPending}>
+          <Button
+            variant="contained"
+            onClick={handleDelete}
+            color="error"
+            disabled={isPending}
+          >
             {isPending ? "Deleting..." : "Delete"}
           </Button>
         </DialogActions>
