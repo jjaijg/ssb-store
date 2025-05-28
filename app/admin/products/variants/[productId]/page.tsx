@@ -8,7 +8,7 @@ import Link from "next/link";
 import React from "react";
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ productId: string }>;
 };
 
 const ProductVariantsPage = async ({ params }: Props) => {
@@ -17,9 +17,9 @@ const ProductVariantsPage = async ({ params }: Props) => {
   // Check if the user is authenticated and has the ADMIN role
   if (session?.user.role !== "ADMIN") throw new Error("User is unauthorized");
 
-  const { id } = await params;
+  const { productId } = await params;
 
-  const { success, variants } = await getProductVariantsByProductId(id);
+  const { success, variants } = await getProductVariantsByProductId(productId);
 
   return (
     <Box component={"section"} width="100%" padding={2}>
@@ -47,7 +47,7 @@ const ProductVariantsPage = async ({ params }: Props) => {
       {/* Create Action Button */}
       <Fab
         LinkComponent={Link}
-        href={`/admin/products/variants/${id}/create`}
+        href={`/admin/products/variants/${productId}/create`}
         color="primary"
         aria-label="add product"
         size="medium"
