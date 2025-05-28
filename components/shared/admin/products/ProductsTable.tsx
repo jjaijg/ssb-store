@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Brand, Category, Product, ProductVariant } from "@prisma/client";
 import Image from "next/image";
 import React from "react";
@@ -84,17 +85,19 @@ const ProductsTable = ({ products }: Props) => {
                 )}
               </TableCell>
               <TableCell>
-                {product.variants.length > 0 ? (
-                  <Chip
-                    label={`${product.variants.length} Variants`}
-                    size="small"
-                    sx={{ margin: "2px", cursor: "pointer" }}
-                    component={Link}
-                    href={`/admin/products/variants/${product.id}`}
-                  />
-                ) : (
-                  <Chip label="No Variants" size="small" color="warning" />
-                )}
+                <Chip
+                  label={
+                    product.variants.length > 0
+                      ? `${product.variants.length} Variants`
+                      : "No Variants"
+                  }
+                  color={product.variants.length > 0 ? "default" : "warning"}
+                  size="small"
+                  sx={{ margin: "2px", cursor: "pointer" }}
+                  component={Link}
+                  href={`/admin/products/variants/${product.id}`}
+                  icon={<VisibilityIcon />}
+                />
               </TableCell>
               <TableCell>
                 {/* Actions Buttons - Edit, Delete */}

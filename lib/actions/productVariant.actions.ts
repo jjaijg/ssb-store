@@ -9,6 +9,8 @@ import {
 } from "../validationSchema/product.schema";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { deleteUploadThingFile } from "./uploadthing.actions";
+import { revalidatePath } from "next/cache";
 
 export const getProductVariantsByProductId = async (productId: string) => {
   try {
@@ -28,6 +30,18 @@ export const getProductVariantsByProductId = async (productId: string) => {
     };
   } catch (error) {
     return { success: false, message: "Failed to fetch product variants" };
+  }
+};
+
+export const getProductVariantById = async (variantId: string) => {
+  try {
+    const varaint = await prisma.productVariant.findUnique({
+      where: { id: variantId },
+    });
+
+    return convertToPlainObject<SerializedProductVariant>(varaint);
+  } catch (error) {
+    return null;
   }
 };
 
@@ -100,6 +114,19 @@ export const updateProductVariant = async (
       return { success: false, message: "Product not found" };
     }
 
+    const existingVariant = await prisma.productVariant.findUnique({
+      where: { id },
+    });
+
+    if (!existingVariant)
+      return { success: false, message: "Product variant not found" };
+
+    if (!parsedData.isDefault && existingVariant.isDefault)
+      return {
+        success: false,
+        message: "Default variant's 'is default' option should not be updated.",
+      };
+
     // Update the product
     const variant = await prisma.productVariant.update({
       where: { id },
@@ -119,6 +146,39 @@ export const updateProductVariant = async (
     }
 
     return { success: true, message: "Product variant updated successfully" };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+};
+
+export const deleteProductVariantById = async (variantId: string) => {
+  try {
+    // Check session
+    const session = await auth();
+    if (!session || session.user.role !== "ADMIN") {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    // Check if the product variant exists
+    const variant = await prisma.productVariant.findUnique({
+      where: { id: variantId },
+    });
+    if (!variant) {
+      return { success: false, message: "Product variant not found" };
+    }
+
+    // Delete product variant by ID
+    await prisma.productVariant.delete({
+      where: { id: variantId },
+    });
+
+    // Delete all images associated with the product
+    if (variant.images.length) {
+      await deleteUploadThingFile(variant.images);
+    }
+
+    revalidatePath(`/admin/products/variants/${variant.productId}`);
+    return { success: true, message: "Product variant deleted successfully" };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

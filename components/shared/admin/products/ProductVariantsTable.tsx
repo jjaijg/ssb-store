@@ -1,5 +1,7 @@
 import { formatId } from "@/lib/utils";
 import {
+  Avatar,
+  AvatarGroup,
   Chip,
   IconButton,
   Paper,
@@ -12,13 +14,12 @@ import {
   TableRow,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import { Brand, Category, Product, ProductVariant } from "@prisma/client";
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 import DeleteDialog from "@/components/delete-dialog";
-import { deleteProductById } from "@/lib/actions/product.actions";
 import { SerializedProductVariant } from "@/types";
+import { deleteProductVariantById } from "@/lib/actions/productVariant.actions";
 
 type Props = {
   variants: SerializedProductVariant[];
@@ -94,25 +95,15 @@ const ProductVariantsTable = ({ variants }: Props) => {
               </TableCell>
               <TableCell>
                 {variant.images.length > 0 ? (
-                  <Stack direction="row" spacing={1}>
-                    {variant.images.slice(0, 3).map((image, index) => (
-                      <Image
-                        key={index}
-                        src={image}
-                        alt={`Variant Image ${index + 1}`}
-                        width={50}
-                        height={50}
-                        style={{ objectFit: "cover" }}
+                  <AvatarGroup max={4} spacing={"small"}>
+                    {variant.images.map((img) => (
+                      <Avatar
+                        alt={variant.variantName}
+                        src={img}
+                        sx={{ border: "2px solid #0030499e !important" }}
                       />
                     ))}
-                    {variant.images.length > 3 && (
-                      <Chip
-                        label={`+${variant.images.length - 3}`}
-                        size="small"
-                        color="info"
-                      />
-                    )}
-                  </Stack>
+                  </AvatarGroup>
                 ) : (
                   "No Images"
                 )}
@@ -122,14 +113,14 @@ const ProductVariantsTable = ({ variants }: Props) => {
                 <Stack direction="row" spacing={1}>
                   <IconButton
                     LinkComponent={Link}
-                    href={`/admin/variants/edit/${variant.id}`}
+                    href={`/admin/products/variants/${variant.productId}/edit/${variant.id}`}
                     color="primary"
                     aria-label="edit product variant"
                   >
                     <EditIcon />
                   </IconButton>
                   <DeleteDialog
-                    action={deleteProductById}
+                    action={deleteProductVariantById}
                     id={variant.id}
                     message="Are you sure you want to delete this product variant? This action cannot be undone."
                   />

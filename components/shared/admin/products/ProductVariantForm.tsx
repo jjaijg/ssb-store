@@ -24,7 +24,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { DiscountType } from "@prisma/client";
 import Image from "next/image";
-import React, { useTransition } from "react";
+import React, { useEffect, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -71,24 +71,16 @@ const ProductVariantForm = (props: Props) => {
       images: mode === "edit" ? props.variant.images : [],
       productId: mode === "edit" ? props.variant.productId : productId,
     },
-    resolver: zodResolver(
-      mode === "create"
-        ? createProductVariantSchema
-        : updateProductVariantSchema
-    ),
+    resolver: zodResolver(createProductVariantSchema),
     mode: "onChange",
   });
 
   const images = watch("images");
-  // const maxOrderQty = watch("maxOrderQty");
+  const isDefaultVariant = mode === "edit" && props.variant.isDefault;
 
-  // useEffect(() => {
-  //   form.trigger("minOrderQty");
-  // }, [maxOrderQty]);
-
-  const handleSubmit = () => {
+  const onSubmit = form.handleSubmit((data) => {
     startTransition(async () => {
-      const data = form.getValues();
+      // const data = form.getValues();
       // Here you would typically send the data to your API or perform some action
       if (mode === "create") {
         const result = await createProductVariant({
@@ -121,11 +113,11 @@ const ProductVariantForm = (props: Props) => {
         }
       }
     });
-  };
+  });
 
   return (
     <>
-      <Box component={"form"} width={"100%"} mt={2}>
+      <Box component={"form"} width={"100%"} mt={2} onSubmit={onSubmit}>
         <Stack spacing={2}>
           <Stack
             direction={{
@@ -177,7 +169,6 @@ const ProductVariantForm = (props: Props) => {
               fullWidth
               label="Value"
               {...form.register("value")}
-              type="number"
               autoComplete="off"
               required
               error={Boolean(form.formState.errors.value)}
@@ -197,7 +188,6 @@ const ProductVariantForm = (props: Props) => {
               fullWidth
               label="Price"
               {...form.register("price")}
-              type="number"
               required
               error={Boolean(form.formState.errors.price)}
               helperText={form.formState.errors.price?.message}
@@ -206,7 +196,6 @@ const ProductVariantForm = (props: Props) => {
               fullWidth
               label="Stock"
               {...form.register("stock")}
-              type="number"
               required
               error={Boolean(form.formState.errors.stock)}
               helperText={form.formState.errors.stock?.message}
@@ -221,26 +210,36 @@ const ProductVariantForm = (props: Props) => {
             justifyContent="space-between"
             width={"100%"}
           >
-            <FormControlLabel
-              sx={{ width: "100%" }}
-              control={
-                <Controller
-                  name={"isActive"}
-                  control={form.control}
-                  render={({ field: props }) => (
-                    <Checkbox
-                      {...props}
-                      checked={props.value}
-                      onChange={(e) => {
-                        props.onChange(e);
-                        form.trigger("isDefault");
-                      }}
-                    />
-                  )}
-                />
-              }
-              label="Is Active"
-            />
+            <FormControl
+              error={Boolean(form.formState.errors.isActive)}
+              fullWidth
+            >
+              <FormControlLabel
+                control={
+                  <Controller
+                    name={"isActive"}
+                    control={form.control}
+                    render={({ field: fieldProps }) => (
+                      <Checkbox
+                        {...fieldProps}
+                        checked={fieldProps.value}
+                        disabled={isDefaultVariant}
+                        onChange={(e) => {
+                          fieldProps.onChange(e);
+                          form.trigger("isDefault");
+                        }}
+                      />
+                    )}
+                  />
+                }
+                label="Is Active"
+              />
+              {isDefaultVariant && (
+                <FormHelperText>
+                  This option is disbaled for default variant
+                </FormHelperText>
+              )}
+            </FormControl>
             <FormControl
               error={Boolean(form.formState.errors.isDefault)}
               fullWidth
@@ -250,17 +249,24 @@ const ProductVariantForm = (props: Props) => {
                   <Controller
                     name={"isDefault"}
                     control={form.control}
-                    render={({ field: props }) => (
+                    render={({ field: fieldProps }) => (
                       <Checkbox
-                        {...props}
-                        checked={props.value}
-                        onChange={props.onChange}
+                        {...fieldProps}
+                        checked={fieldProps.value}
+                        disabled={isDefaultVariant}
+                        onChange={fieldProps.onChange}
                       />
                     )}
                   />
                 }
                 label="Is Default Variant"
               />
+              {isDefaultVariant && (
+                <FormHelperText>
+                  This option is disbaled for default variant
+                </FormHelperText>
+              )}
+
               {form.formState.errors.isDefault && (
                 <FormHelperText error>
                   {form.formState.errors.isDefault.message}
@@ -281,7 +287,6 @@ const ProductVariantForm = (props: Props) => {
               fullWidth
               label="Minimum Order Quantity"
               {...form.register("minOrderQty")}
-              type="number"
               required
               error={Boolean(form.formState.errors.minOrderQty)}
               helperText={form.formState.errors.minOrderQty?.message}
@@ -294,7 +299,6 @@ const ProductVariantForm = (props: Props) => {
                   form.trigger("minOrderQty");
                 },
               })}
-              type="number"
               required
               error={Boolean(form.formState.errors.maxOrderQty)}
               helperText={form.formState.errors.maxOrderQty?.message}
@@ -345,7 +349,6 @@ const ProductVariantForm = (props: Props) => {
               fullWidth
               label="Discount Value"
               {...form.register("discountValue")}
-              type="number"
               autoComplete="off"
               error={Boolean(form.formState.errors.discountValue)}
               helperText={form.formState.errors.discountValue?.message}
@@ -432,7 +435,6 @@ const ProductVariantForm = (props: Props) => {
             variant="contained"
             color="primary"
             disabled={isPending}
-            onClick={handleSubmit}
           >
             {isPending
               ? "Submitting..."
