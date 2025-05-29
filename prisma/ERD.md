@@ -6,6 +6,26 @@
 ## default
 ```mermaid
 erDiagram
+"Cart" {
+  String id PK
+  String userId FK "nullable"
+  String sessioncartId
+  Decimal shippingPrice
+  Decimal taxPrice
+  DateTime createdAt
+  DateTime updatedAt
+}
+"CartItem" {
+  String id PK
+  String cartId FK
+  String variantId FK
+  Int quantity
+  Decimal price
+  DiscountType discountType
+  Decimal discountValue "nullable"
+  DateTime createdAt
+  DateTime updatedAt
+}
 "Category" {
   String id PK
   String name UK
@@ -111,12 +131,39 @@ erDiagram
   DateTime createdAt
   DateTime updatedAt
 }
+"Cart" }o--o| "User" : user
+"CartItem" }o--|| "Cart" : cart
+"CartItem" }o--|| "ProductVariant" : variant
 "Product" }o--|| "Category" : category
 "Product" }o--|| "Brand" : brand
 "ProductVariant" }o--|| "Product" : product
 "Account" }o--|| "User" : user
 "Session" }o--|| "User" : user
 ```
+
+### `Cart`
+
+**Properties**
+  - `id`: 
+  - `userId`: 
+  - `sessioncartId`: 
+  - `shippingPrice`: 
+  - `taxPrice`: 
+  - `createdAt`: 
+  - `updatedAt`: 
+
+### `CartItem`
+
+**Properties**
+  - `id`: 
+  - `cartId`: 
+  - `variantId`: 
+  - `quantity`: 
+  - `price`: 
+  - `discountType`: 
+  - `discountValue`: 
+  - `createdAt`: 
+  - `updatedAt`: 
 
 ### `Category`
 
