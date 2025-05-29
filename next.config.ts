@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         hostname: "b7oaky019a.ufs.sh",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+        port: "",
+      },
     ],
   },
 };

@@ -1,4 +1,4 @@
-import { Product, ProductVariant } from "@prisma/client";
+import { Brand, Category, Product, ProductVariant } from "@prisma/client";
 
 export type SerializedProduct = Omit<Product, "rating"> & {
   rating: number; // Instead of Decimal
@@ -15,5 +15,7 @@ export type SerializedProductVariant = Omit<
 };
 
 export type SerializedProductWithVariants = SerializedProduct & {
+  category: Category;
+  brand: Brand;
   variants: SerializedProductVariant[];
 };

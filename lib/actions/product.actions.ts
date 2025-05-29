@@ -8,7 +8,7 @@ import {
 } from "../validationSchema/product.schema";
 import { auth } from "@/auth";
 import { convertToPlainObject, formatError, serializeDecimal } from "../utils";
-import { SerializedProduct } from "@/types";
+import { SerializedProduct, SerializedProductWithVariants } from "@/types";
 import { revalidatePath } from "next/cache";
 import { deleteUploadThingFile } from "./uploadthing.actions";
 
@@ -29,6 +29,28 @@ export const getAllProductsWithVariants = async () => {
     return { success: true, products };
   } catch (error) {
     return { success: false, message: "Failed to fetch products" };
+  }
+};
+
+export const getProductswithVariants = async ({
+  limit = 2,
+}: {
+  limit: number;
+}) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: { id: "cmb6klmzc000vbv6gp8gmj4i1" },
+      include: {
+        variants: true,
+        category: true,
+        brand: true,
+      },
+      take: limit,
+    });
+
+    return convertToPlainObject<SerializedProductWithVariants[]>(products);
+  } catch (error) {
+    return [] as SerializedProductWithVariants[];
   }
 };
 
