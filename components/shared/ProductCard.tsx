@@ -9,34 +9,29 @@ import {
   Stack,
   Chip,
   Rating,
-  IconButton,
   ToggleButton,
   Tooltip,
   ToggleButtonGroup,
 } from "@mui/material";
-import {
-  ShoppingCart,
-  Favorite,
-  Add as AddIcon,
-  Remove as RemoveIcon,
-} from "@mui/icons-material";
 import { Brand, Category } from "@prisma/client";
 import Image from "next/image";
-import { SerializedProductWithVariants } from "@/types";
-import { useState } from "react";
-
-type VariantQuantities = {
-  [variantId: string]: number;
-};
+import { SerializedCart, SerializedProductWithVariants } from "@/types";
+import { useState, useTransition } from "react";
+import { addToCart, removeFromCart } from "@/lib/actions/cart.actions";
+import { toast } from "react-toastify";
+import Link from "next/link";
+import QuantitySelector from "./QuantitySelector";
 
 type ProductCardProps = {
+  cart: SerializedCart | null;
   product: SerializedProductWithVariants & {
     brand: Brand;
     category: Category;
   };
 };
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ cart, product }: ProductCardProps) {
+  const [pending, startTransition] = useTransition();
   const [selectedVariant, setSelectedVariant] = useState(
     product.variants.find((v) => v.isDefault) || product.variants[0]
   );
@@ -50,32 +45,30 @@ export default function ProductCard({ product }: ProductCardProps) {
       ? originalPrice - selectedVariant.discountValue
       : originalPrice;
 
-  // Track quantities for all variants
-  const [variantQuantities, setVariantQuantities] = useState<VariantQuantities>(
-    {}
-  );
+  const handleQuantityChange = (quantity: number, action: "add" | "remove") => {
+    if (!selectedVariant) return;
 
-  const handleAddToCart = (variantId: string) => {
-    setVariantQuantities((prev) => ({
-      ...prev,
-      [variantId]: 1,
-    }));
-    // Add to cart logic here
-  };
+    // Update cart logic here
+    if (action === "add") {
+      startTransition(async () => {
+        const { message, success } = await addToCart({
+          variantId: selectedVariant.id,
+          price: selectedVariant.price,
+          discountType: selectedVariant.discountType,
+          discountValue: selectedVariant.discountValue,
+          quantity: 1,
+        });
 
-  const handleUpdateQuantity = (variantId: string, newQuantity: number) => {
-    const variant = product.variants.find((v) => v.id === variantId);
-    if (!variant) return;
+        if (success) toast.success(message);
+        if (!success) toast.error(message);
+      });
+    } else if (action === "remove") {
+      startTransition(async () => {
+        const { message, success } = await removeFromCart(selectedVariant.id);
 
-    if (
-      newQuantity >= 0 &&
-      newQuantity <= Math.min(variant.maxOrderQty ?? 0, variant.stock)
-    ) {
-      setVariantQuantities((prev) => ({
-        ...prev,
-        [variantId]: newQuantity,
-      }));
-      // Update cart logic here
+        if (success) toast.success(message);
+        if (!success) toast.error(message);
+      });
     }
   };
 
@@ -93,7 +86,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       }}
     >
       {/* Image Box */}
-      <Box sx={{ position: "relative", paddingTop: "100%" }}>
+      <Box
+        sx={{ position: "relative", paddingTop: "100%" }}
+        component={Link}
+        href={`/product/${product.slug}`}
+      >
         <CardMedia
           component="div"
           sx={{
@@ -134,20 +131,22 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Typography variant="subtitle2" color="text.secondary" gutterBottom>
           {product.brand.name}
         </Typography>
-        <Typography
-          variant="h6"
-          component="h2"
-          gutterBottom
-          sx={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-          }}
-        >
-          {product.name}
-        </Typography>
+        <Link href={`/product/${product.slug}`}>
+          <Typography
+            variant="h6"
+            component="h2"
+            gutterBottom
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {product.name}
+          </Typography>
+        </Link>
 
         {/* Add variants section */}
         <Box sx={{ mb: 2 }}>
@@ -180,6 +179,12 @@ export default function ProductCard({ product }: ProductCardProps) {
                 key={variant.id}
                 value={variant.id}
                 disabled={!variant.isActive || variant.stock === 0}
+                sx={{
+                  cursor:
+                    !variant.isActive || variant.stock === 0
+                      ? "not-allowed"
+                      : "pointer",
+                }}
               >
                 <Tooltip title={variant.stock === 0 ? "Out of Stock" : ""}>
                   <Box>
@@ -226,63 +231,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             {/* <IconButton size="small" color="primary">
               <Favorite />
             </IconButton> */}
-            {!variantQuantities[selectedVariant.id] ? (
-              <IconButton
-                size="small"
-                color="primary"
-                onClick={() => handleAddToCart(selectedVariant.id)}
-                disabled={
-                  !selectedVariant.isActive || selectedVariant.stock === 0
-                }
-              >
-                <ShoppingCart />
-              </IconButton>
-            ) : (
-              <Stack
-                direction="row"
-                alignItems="center"
-                spacing={1}
-                sx={{
-                  border: 1,
-                  borderColor: "primary.main",
-                  borderRadius: 1,
-                  px: 0.5,
-                }}
-              >
-                <IconButton
-                  size="medium"
-                  onClick={() =>
-                    handleUpdateQuantity(
-                      selectedVariant.id,
-                      variantQuantities[selectedVariant.id] - 1
-                    )
-                  }
-                >
-                  <RemoveIcon fontSize="medium" />
-                </IconButton>
-                <Typography variant="body2">
-                  {variantQuantities[selectedVariant.id]}
-                </Typography>
-                <IconButton
-                  size="medium"
-                  onClick={() =>
-                    handleUpdateQuantity(
-                      selectedVariant.id,
-                      variantQuantities[selectedVariant.id] + 1
-                    )
-                  }
-                  disabled={
-                    variantQuantities[selectedVariant.id] >=
-                    Math.min(
-                      selectedVariant.maxOrderQty ?? 0,
-                      selectedVariant.stock
-                    )
-                  }
-                >
-                  <AddIcon fontSize="medium" />
-                </IconButton>
-              </Stack>
-            )}
+            <QuantitySelector
+              cart={cart}
+              isLoading={pending}
+              variant={selectedVariant}
+              onQuantityChange={handleQuantityChange}
+            />
           </Stack>
         </Stack>
       </CardContent>

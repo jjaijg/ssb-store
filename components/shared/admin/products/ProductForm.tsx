@@ -28,7 +28,7 @@ import Image from "next/image";
 import React, { useEffect, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import slugify from "slugify";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   createProductWithoutVariants,
   updateProductWithoutVariants,
@@ -377,7 +377,6 @@ const ProductForm = (props: Props) => {
           </Button>
         </Stack>
       </Box>
-      <ToastContainer position="bottom-right" autoClose={5000} />
     </>
   );
 };

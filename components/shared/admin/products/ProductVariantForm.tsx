@@ -26,7 +26,7 @@ import { DiscountType } from "@prisma/client";
 import Image from "next/image";
 import React, { useEffect, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { SerializedProductVariant } from "@/types";
 import { deleteUploadThingFile } from "@/lib/actions/uploadthing.actions";
@@ -444,7 +444,6 @@ const ProductVariantForm = (props: Props) => {
           </Button>
         </Stack>
       </Box>
-      <ToastContainer position="bottom-right" autoClose={5000} />
     </>
   );
 };

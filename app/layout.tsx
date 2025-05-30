@@ -5,6 +5,7 @@ import AppProvider from "@/providers/AppProvider";
 import SessionProvider from "@/providers/SessionProvider";
 
 import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from "@/lib/constants";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({
         <SessionProvider>
           <AppProvider>{children}</AppProvider>
         </SessionProvider>
+        <ToastContainer position="bottom-right" autoClose={5000} />
       </body>
     </html>
   );
