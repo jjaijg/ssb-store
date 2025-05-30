@@ -106,3 +106,17 @@ export function serializeDecimal<T>(obj: T): T {
 
   return stringify(obj) as T;
 }
+
+// Cart item validation helper
+export const validateQuantity = (
+  currentQty: number,
+  requestedQty: number,
+  variant: { stock: number; maxOrderQty?: number | null }
+) => {
+  if (currentQty + requestedQty > variant.stock) {
+    throw new Error("Not enough stock");
+  }
+  if (variant.maxOrderQty && currentQty + requestedQty > variant.maxOrderQty) {
+    throw new Error(`Maximum order limit is ${variant.maxOrderQty}`);
+  }
+};

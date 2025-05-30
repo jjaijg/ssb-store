@@ -12,6 +12,25 @@ import { SerializedProduct, SerializedProductWithVariants } from "@/types";
 import { revalidatePath } from "next/cache";
 import { deleteUploadThingFile } from "./uploadthing.actions";
 
+export const getProductBySlug = async (slug: string) => {
+  try {
+    const product = await prisma.product.findFirst({
+      where: { slug },
+      include: {
+        variants: true,
+        category: true,
+        brand: true,
+      },
+    });
+
+    if (!product) return null;
+
+    return convertToPlainObject<SerializedProductWithVariants>(product);
+  } catch (error) {
+    return null;
+  }
+};
+
 export const getAllProductsWithVariants = async () => {
   try {
     // Fetch all products from the database
@@ -39,7 +58,6 @@ export const getProductswithVariants = async ({
 }) => {
   try {
     const products = await prisma.product.findMany({
-      where: { id: "cmb6klmzc000vbv6gp8gmj4i1" },
       include: {
         variants: true,
         category: true,

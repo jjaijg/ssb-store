@@ -1,4 +1,5 @@
 import ProductCard from "@/components/shared/ProductCard";
+import { getUserCart } from "@/lib/actions/cart.actions";
 import { getProductswithVariants } from "@/lib/actions/product.actions";
 import { Stack } from "@mui/material";
 import { Metadata } from "next";
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
+  const cart = await getUserCart();
   const products = await getProductswithVariants({ limit: 10 });
 
   return (
@@ -17,7 +19,7 @@ export default async function Home() {
         <section>
           <Stack direction={"row"} spacing={2}>
             {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard key={p.id} product={p} cart={cart} />
             ))}
           </Stack>
         </section>
