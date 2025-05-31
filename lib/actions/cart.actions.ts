@@ -5,19 +5,23 @@ import { convertToPlainObject, formatError, validateQuantity } from "../utils";
 import { prisma } from "../prisma";
 import { z } from "zod";
 import { cartItemSchema } from "../validationSchema/cart.schema";
-import { Cart } from "@prisma/client";
-import { SerializedCart, SerializedCartItem } from "@/types";
+import { SerializedCart } from "@/types";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 export const getUserCart = async () => {
   try {
+    // check for cart cookie
+    const sessioncartId = (await cookies()).get("sessionCartId")?.value;
+
+    if (!sessioncartId) throw new Error("Cart session not found");
+
     const session = await auth();
-    if (!session) {
-      return null;
-    }
+
+    const userId = session?.user.id;
 
     const cart = await prisma.cart.findFirst({
-      where: { userId: session.user.id },
+      where: userId ? { userId } : { sessioncartId },
       include: {
         items: {
           include: {
@@ -60,10 +64,14 @@ export const getUserCart = async () => {
 
 export const addToCart = async (item: z.infer<typeof cartItemSchema>) => {
   try {
+    // check for cart cookie
+    const sessioncartId = (await cookies()).get("sessionCartId")?.value;
+
+    if (!sessioncartId) throw new Error("Cart session not found");
+
     const session = await auth();
-    if (!session?.user) {
-      return { success: false, message: "Unauthorized" };
-    }
+
+    const userId = session?.user.id;
 
     // Validate input
     const parsedItem = cartItemSchema.parse(item);
@@ -85,15 +93,15 @@ export const addToCart = async (item: z.infer<typeof cartItemSchema>) => {
 
       // Get or create cart
       let cart = await tx.cart.findFirst({
-        where: { userId: session.user.id },
+        where: userId ? { userId } : { sessioncartId },
         include: { items: true },
       });
 
       if (!cart) {
         cart = await tx.cart.create({
           data: {
-            userId: session.user.id,
-            sessioncartId: session.user.id,
+            userId: userId,
+            sessioncartId,
           },
           include: { items: true },
         });
@@ -147,10 +155,14 @@ export const addToCart = async (item: z.infer<typeof cartItemSchema>) => {
 
 export const removeFromCart = async (variantId: string) => {
   try {
+    // check for cart cookie
+    const sessioncartId = (await cookies()).get("sessionCartId")?.value;
+
+    if (!sessioncartId) throw new Error("Cart session not found");
+
     const session = await auth();
-    if (!session?.user) {
-      return { success: false, message: "Unauthorized" };
-    }
+
+    const userId = session?.user.id;
 
     return await prisma.$transaction(async (tx) => {
       // Find the cart item and verify ownership
@@ -158,7 +170,14 @@ export const removeFromCart = async (variantId: string) => {
         where: {
           variantId,
           cart: {
-            userId: session.user.id,
+            OR: [
+              {
+                userId,
+              },
+              {
+                sessioncartId,
+              },
+            ],
           },
         },
         include: {

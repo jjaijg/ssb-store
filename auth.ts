@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma"; // Ensure you have a Prisma client setup
 import bcrypt from "bcryptjs";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { cookies } from "next/headers";
 
 export const config = {
   session: {
@@ -61,6 +62,36 @@ export const config = {
         token.id = user.id;
         token.role = user.role;
       }
+
+      // check for session cart
+      if (trigger === "signIn" || trigger === "signUp") {
+        const cookiesObj = await cookies();
+        const sessionCartId = cookiesObj.get("sessionCartId")?.value;
+
+        if (sessionCartId) {
+          const sessionCart = await prisma.cart.findFirst({
+            where: { sessioncartId: sessionCartId },
+          });
+
+          if (sessionCart) {
+            // delete current user cart
+            await prisma.cart.deleteMany({
+              where: {
+                userId: user.id,
+              },
+            });
+
+            // Assign new cart
+            await prisma.cart.update({
+              where: { id: sessionCart.id },
+              data: {
+                userId: user.id,
+              },
+            });
+          }
+        }
+      }
+
       return token;
     },
     async session({ session, token, trigger, user }) {

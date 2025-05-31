@@ -44,21 +44,39 @@ export const authConfig = {
       );
 
       // If it's an admin route, check for admin role
-      if (isAdminRoute) {
+      if (isAdminRoute && !auth) {
         // Role is not getting exposed in the auth object
         // Uncomment the following line if you have a way to access user role in auth
         // until then each admin page will check the role
         // return auth?.user.role === "ADMIN";
-        return !!auth;
-      }
-
-      // For protected routes, check if user is authenticated
-      if (isProtectedRoute) {
-        return !!auth;
+        return false;
+      } else if (isProtectedRoute && !auth) {
+        // For protected routes, check if user is authenticated
+        return false;
       }
 
       // Allow access to public routes
-      return true;
+      // Check for cart session cookie
+      if (!request.cookies.get("sessionCartId")) {
+        // Generate new session cartId cookie
+        const sessionCartId = crypto.randomUUID();
+
+        // clone request headers
+        const newReqHeaders = new Headers(request.headers);
+
+        // create new response and add new headers
+        const response = NextResponse.next({
+          request: {
+            headers: newReqHeaders,
+          },
+        });
+
+        // set newly generated sessionCartId in the response cookies
+        response.cookies.set("sessionCartId", sessionCartId);
+        return response;
+      } else {
+        return true;
+      }
     },
   },
 } satisfies NextAuthConfig;
