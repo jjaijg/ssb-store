@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import {
+  Badge,
   Box,
   Button,
   Drawer,
@@ -22,12 +23,17 @@ import PersonIcon from "@mui/icons-material/Person";
 import HistoryIcon from "@mui/icons-material/History";
 import LogoutIcon from "@mui/icons-material/Logout";
 import UserMenu from "./UserMenu";
+import { SerializedCart } from "@/types";
 
-const HeaderMenu = () => {
+type Props = {
+  cart?: SerializedCart | null;
+};
+
+const HeaderMenu = ({ cart }: Props) => {
   // State to control the drawer open/close
   const [open, setOpen] = useState(false);
 
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   // Function to toggle the drawer
   const toggleDrawer = (open: boolean) => () => {
@@ -133,9 +139,20 @@ const HeaderMenu = () => {
           gap: 2,
         }}
       >
-        <Button color="inherit" startIcon={<CartIcon />}>
-          Cart
-        </Button>
+        <Badge
+          color="secondary"
+          badgeContent={cart?.items.length}
+          invisible={!cart || cart.items.length === 0}
+        >
+          <Button
+            color="inherit"
+            startIcon={<CartIcon />}
+            LinkComponent={Link}
+            href="/cart"
+          >
+            Cart
+          </Button>
+        </Badge>
         <UserMenu />
       </Stack>
     </>

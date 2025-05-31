@@ -8,8 +8,10 @@ import CategoryMenu from "./CategoryMenu";
 import HeaderMenu from "./HeaderMenu";
 import { APP_NAME } from "@/lib/constants";
 import Link from "next/link";
+import { SerializedCart } from "@/types";
 
 type Props = {
+  cart?: SerializedCart | null;
   renderMenu?: () => React.ReactNode;
   hideBranding?: boolean;
   hideSearch?: boolean;
@@ -17,6 +19,7 @@ type Props = {
 };
 
 const AppHeader = ({
+  cart,
   renderMenu,
   hideBranding,
   hideSearch,
@@ -32,14 +35,18 @@ const AppHeader = ({
           <Box sx={{ display: "flex", flexGrow: 1 }}>
             {/* Logo and title */}
             <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
-              <Image
-                src={"/images/logo.webp"}
-                alt={`${APP_NAME} Logo`}
-                width={60}
-                height={60}
-              />
+              <Link href={"/"}>
+                <Image
+                  src={"/images/logo.webp"}
+                  alt={`${APP_NAME} Logo`}
+                  width={60}
+                  height={60}
+                />
+              </Link>
               {!hideBranding && (
-                <Typography variant="h5">{APP_NAME}</Typography>
+                <Link href={"/"}>
+                  <Typography variant="h5">{APP_NAME}</Typography>
+                </Link>
               )}
             </Box>
             {/* App menu */}
@@ -47,7 +54,7 @@ const AppHeader = ({
             {/* Search bar */}
             {!hideSearch && <HeaderSearch />}
             {/* Menu list */}
-            <HeaderMenu />
+            <HeaderMenu cart={cart} />
           </Box>
         </Toolbar>
       </AppBar>
