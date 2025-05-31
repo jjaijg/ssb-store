@@ -115,3 +115,28 @@ export const deleteBrandAction = async (id: string) => {
     return { success: false, message: formatError(error) };
   }
 };
+
+// Landing page actions
+// ...existing imports...
+
+export const getFeaturedBrands = async ({ limit }: { limit?: number } = {}) => {
+  try {
+    const brands = await prisma.brand.findMany({
+      where: {
+        // status: "ACTIVE",
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        logoUrl: true,
+      },
+      take: limit,
+    });
+
+    return brands;
+  } catch (error) {
+    console.error("Error fetching featured brands:", error);
+    return [];
+  }
+};

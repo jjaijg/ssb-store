@@ -1,29 +1,55 @@
-import ProductCard from "@/components/shared/ProductCard";
+import {
+  BenefitsSection,
+  BrandShowcase,
+  FeaturedCategories,
+  FeaturedProducts,
+  HeroSection,
+  SpecialOffers,
+} from "@/components/shared/home";
+import { FeaturedSkeleton } from "@/components/shared/skeletons/FeaturedSkeleton";
+import { getFeaturedBrands } from "@/lib/actions/brand.actions";
 import { getUserCart } from "@/lib/actions/cart.actions";
-import { getProductswithVariants } from "@/lib/actions/product.actions";
-import { Stack } from "@mui/material";
+import { getFeaturedCategories } from "@/lib/actions/category.actions";
+import {
+  getFeaturedProducts,
+  getProductsWithBanner,
+} from "@/lib/actions/product.actions";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: `Home`,
+  title: "SSB Store - Your One Stop Shop",
+  description: "Discover amazing products at great prices",
 };
 
 export default async function Home() {
-  const cart = await getUserCart();
-  const products = await getProductswithVariants({ limit: 10 });
-
+  const [
+    bannerProducts,
+    featuredProducts,
+    featuredCategories,
+    featuredBrands,
+    cart,
+  ] = await Promise.all([
+    getProductsWithBanner({ limit: 5 }),
+    getFeaturedProducts({ limit: 8 }),
+    getFeaturedCategories({ limit: 8 }),
+    getFeaturedBrands({ limit: 8 }),
+    getUserCart(),
+  ]);
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        Welcome to SSB Store - Root page
-        <section>
-          <Stack direction={"row"} spacing={2}>
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} cart={cart} />
-            ))}
-          </Stack>
-        </section>
-      </main>
-    </div>
+    <main className="flex flex-col min-h-screen">
+      <HeroSection products={bannerProducts} />
+      <Suspense fallback={<FeaturedSkeleton height={200} />}>
+        <FeaturedCategories categories={featuredCategories} />
+      </Suspense>
+      <Suspense fallback={<FeaturedSkeleton />}>
+        <FeaturedProducts products={featuredProducts} cart={cart} />
+      </Suspense>
+      <SpecialOffers />
+      <Suspense fallback={<FeaturedSkeleton height={120} />}>
+        <BrandShowcase brands={featuredBrands} />
+      </Suspense>
+      <BenefitsSection />
+    </main>
   );
 }

@@ -38,3 +38,14 @@ export type SerializedCart = Omit<Cart, "shippingPrice" | "taxPrice"> & {
   taxPrice: number;
   items: SerializedCartItem[];
 };
+
+// Home page types
+export type BannerProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  bannerImage: string;
+  brand: {
+    name: string;
+  };
+};

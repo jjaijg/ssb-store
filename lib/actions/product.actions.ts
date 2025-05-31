@@ -8,7 +8,11 @@ import {
 } from "../validationSchema/product.schema";
 import { auth } from "@/auth";
 import { convertToPlainObject, formatError, serializeDecimal } from "../utils";
-import { SerializedProduct, SerializedProductWithVariants } from "@/types";
+import {
+  BannerProduct,
+  SerializedProduct,
+  SerializedProductWithVariants,
+} from "@/types";
 import { revalidatePath } from "next/cache";
 import { deleteUploadThingFile } from "./uploadthing.actions";
 
@@ -202,5 +206,72 @@ export const deleteProductById = async (id: string) => {
     return { success: true, message: "Product deleted successfully" };
   } catch (error) {
     return { success: false, message: formatError(error) };
+  }
+};
+
+// Landing page actions
+
+export const getProductsWithBanner = async ({ limit }: { limit?: number }) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        bannerImage: {
+          not: null,
+        },
+        status: "ACTIVE",
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        bannerImage: true,
+        brand: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      take: limit,
+    });
+
+    return products as BannerProduct[];
+  } catch (error) {
+    console.error("Error fetching banner products:", error);
+    return [] as BannerProduct[];
+  }
+};
+
+export const getFeaturedProducts = async ({
+  limit = 8,
+}: { limit?: number } = {}) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        isFeatured: true,
+        status: "ACTIVE",
+      },
+      include: {
+        variants: {
+          where: { isActive: true },
+          orderBy: { isDefault: "desc" },
+        },
+        brand: {
+          select: {
+            name: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      take: limit,
+    });
+
+    return convertToPlainObject<SerializedProductWithVariants[]>(products);
+  } catch (error) {
+    console.error("Error fetching featured products:", error);
+    return [];
   }
 };

@@ -104,6 +104,7 @@ const ProductForm = (props: Props) => {
         const result = await createProductWithoutVariants({
           ...data,
           isFeatured: !!data.isFeatured,
+          bannerImage: data.bannerImage || undefined,
         });
         if (result.success) {
           toast.success("Product created successfully!");
@@ -117,6 +118,7 @@ const ProductForm = (props: Props) => {
           ...data,
           id: props.id,
           isFeatured: !!data.isFeatured,
+          bannerImage: data.bannerImage || undefined,
         });
         if (result.success) {
           toast.success("Product updated successfully!");

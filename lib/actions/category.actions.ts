@@ -115,3 +115,41 @@ export const deleteCategoryAction = async (id: string) => {
     return { success: false, message: formatError(error) };
   }
 };
+
+// Landing page action
+export const getFeaturedCategories = async ({ limit }: { limit?: number }) => {
+  try {
+    const categories = await prisma.category.findMany({
+      where: {
+        // isFeatured: true,
+        // status: "ACTIVE"
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        image: true,
+        _count: {
+          select: {
+            products: {
+              where: {
+                status: "ACTIVE",
+              },
+            },
+          },
+        },
+      },
+      take: limit,
+      orderBy: {
+        products: {
+          _count: "desc",
+        },
+      },
+    });
+
+    return categories;
+  } catch (error) {
+    console.error("Error fetching featured categories:", error);
+    return [];
+  }
+};
