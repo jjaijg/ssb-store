@@ -26,6 +26,41 @@ erDiagram
   DateTime createdAt
   DateTime updatedAt
 }
+"orders" {
+  String id PK
+  String orderNumber UK
+  String userId FK
+  OrderStatus status
+  PaymentStatus paymentStatus
+  String paymentMethod "nullable"
+  String paymentId "nullable"
+  Json paymentResult "nullable"
+  String shippingAddressId FK
+  String billingAddressId FK
+  Decimal subtotal
+  Decimal shippingCost
+  Decimal tax
+  Decimal discount
+  Decimal total
+  String notes "nullable"
+  Json metadata "nullable"
+  DateTime createdAt
+  DateTime updatedAt
+}
+"order_items" {
+  String id PK
+  String orderId FK
+  String variantId FK
+  String name
+  String sku
+  Int quantity
+  Decimal price
+  Decimal discount
+  Decimal total
+  Json metadata "nullable"
+  DateTime createdAt
+  DateTime updatedAt
+}
 "Category" {
   String id PK
   String name UK
@@ -86,6 +121,18 @@ erDiagram
   DateTime createdAt
   DateTime updatedAt
 }
+"addresses" {
+  String id PK
+  String userId FK
+  String street
+  String city
+  String state
+  String country
+  String postalCode
+  Boolean isDefault
+  DateTime createdAt
+  DateTime updatedAt
+}
 "User" {
   String id PK
   String name "nullable"
@@ -93,7 +140,6 @@ erDiagram
   DateTime emailVerified "nullable"
   String image "nullable"
   Role role
-  Json address "nullable"
   String phone "nullable"
   String password "nullable"
   DateTime createdAt
@@ -134,9 +180,15 @@ erDiagram
 "Cart" }o--o| "User" : user
 "CartItem" }o--|| "Cart" : cart
 "CartItem" }o--|| "ProductVariant" : variant
+"orders" }o--|| "User" : user
+"orders" }o--|| "addresses" : shippingAddress
+"orders" }o--|| "addresses" : billingAddress
+"order_items" }o--|| "orders" : order
+"order_items" }o--|| "ProductVariant" : variant
 "Product" }o--|| "Category" : category
 "Product" }o--|| "Brand" : brand
 "ProductVariant" }o--|| "Product" : product
+"addresses" }o--|| "User" : user
 "Account" }o--|| "User" : user
 "Session" }o--|| "User" : user
 ```
@@ -162,6 +214,45 @@ erDiagram
   - `price`: 
   - `discountType`: 
   - `discountValue`: 
+  - `createdAt`: 
+  - `updatedAt`: 
+
+### `orders`
+
+**Properties**
+  - `id`: 
+  - `orderNumber`: 
+  - `userId`: 
+  - `status`: 
+  - `paymentStatus`: 
+  - `paymentMethod`: 
+  - `paymentId`: 
+  - `paymentResult`: 
+  - `shippingAddressId`: 
+  - `billingAddressId`: 
+  - `subtotal`: 
+  - `shippingCost`: 
+  - `tax`: 
+  - `discount`: 
+  - `total`: 
+  - `notes`: 
+  - `metadata`: 
+  - `createdAt`: 
+  - `updatedAt`: 
+
+### `order_items`
+
+**Properties**
+  - `id`: 
+  - `orderId`: 
+  - `variantId`: 
+  - `name`: 
+  - `sku`: 
+  - `quantity`: 
+  - `price`: 
+  - `discount`: 
+  - `total`: 
+  - `metadata`: 
   - `createdAt`: 
   - `updatedAt`: 
 
@@ -233,6 +324,20 @@ erDiagram
   - `createdAt`: 
   - `updatedAt`: 
 
+### `addresses`
+
+**Properties**
+  - `id`: 
+  - `userId`: 
+  - `street`: 
+  - `city`: 
+  - `state`: 
+  - `country`: 
+  - `postalCode`: 
+  - `isDefault`: 
+  - `createdAt`: 
+  - `updatedAt`: 
+
 ### `User`
 
 **Properties**
@@ -242,7 +347,6 @@ erDiagram
   - `emailVerified`: 
   - `image`: 
   - `role`: 
-  - `address`: 
   - `phone`: 
   - `password`: 
   - `createdAt`: 
