@@ -7,6 +7,7 @@ import { z } from "zod";
 import { cartItemSchema } from "../validationSchema/cart.schema";
 import { Cart } from "@prisma/client";
 import { SerializedCart, SerializedCartItem } from "@/types";
+import { revalidatePath } from "next/cache";
 
 export const getUserCart = async () => {
   try {
@@ -129,6 +130,8 @@ export const addToCart = async (item: z.infer<typeof cartItemSchema>) => {
         });
       }
 
+      revalidatePath("/cart");
+
       return {
         success: true,
         message: "Item added to cart successfully",
@@ -195,6 +198,8 @@ export const removeFromCart = async (variantId: string) => {
           where: { id: cartItem.cartId },
         });
       }
+
+      revalidatePath("/cart");
 
       return {
         success: true,
