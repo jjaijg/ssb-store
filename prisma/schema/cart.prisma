@@ -1,16 +1,18 @@
 model Cart {
     id            String     @id @default(cuid())
-    userId        String? // Optional for guest checkout
-    sessioncartId String
+    userId        String? // for guest users
+    sessioncartId String? // for logged in users
     shippingPrice Decimal    @default(0) @db.Decimal(12, 2)
     taxPrice      Decimal    @default(0) @db.Decimal(12, 2)
+    isActive      Boolean    @default(true)
     createdAt     DateTime   @default(now())
     updatedAt     DateTime   @updatedAt
     items         CartItem[]
 
     user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
+    @@index([sessioncartId, isActive])
+    @@index([userId, isActive])
 }
 
 model CartItem {

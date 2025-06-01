@@ -9,6 +9,36 @@ import { SerializedCart } from "@/types";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
+async function getOrCreateCart(sessioncartId: string, userId?: string) {
+  // First try to find an existing cart
+  const existingCart = await prisma.cart.findFirst({
+    where: {
+      AND: [
+        { isActive: true },
+        userId
+          ? { userId }
+          : {
+              sessioncartId,
+              userId: null, // Ensure we get guest cart only
+            },
+      ],
+    },
+  });
+
+  if (existingCart) {
+    return existingCart;
+  }
+
+  // If no cart exists, create a new one
+  return await prisma.cart.create({
+    data: {
+      sessioncartId,
+      userId: userId || null,
+      isActive: true,
+    },
+  });
+}
+
 export const getUserCart = async () => {
   try {
     // check for cart cookie
@@ -21,7 +51,7 @@ export const getUserCart = async () => {
     const userId = session?.user.id;
 
     const cart = await prisma.cart.findFirst({
-      where: userId ? { userId } : { sessioncartId },
+      where: userId ? { userId } : { sessioncartId, userId: null },
       include: {
         items: {
           include: {
@@ -91,21 +121,8 @@ export const addToCart = async (item: z.infer<typeof cartItemSchema>) => {
         return { success: false, message: "Product is out of stock" };
       }
 
-      // Get or create cart
-      let cart = await tx.cart.findFirst({
-        where: userId ? { userId } : { sessioncartId },
-        include: { items: true },
-      });
-
-      if (!cart) {
-        cart = await tx.cart.create({
-          data: {
-            userId: userId,
-            sessioncartId,
-          },
-          include: { items: true },
-        });
-      }
+      // Get or create appropriate cart
+      const cart = await getOrCreateCart(sessioncartId, userId);
 
       // Check existing item in cart
       const existingItem = await tx.cartItem.findFirst({
@@ -131,9 +148,6 @@ export const addToCart = async (item: z.infer<typeof cartItemSchema>) => {
           data: {
             ...parsedItem,
             cartId: cart.id,
-            // price: variant.price,
-            // discountType: variant.discountType,
-            // discountValue: variant.discountValue,
           },
         });
       }
@@ -176,6 +190,7 @@ export const removeFromCart = async (variantId: string) => {
               },
               {
                 sessioncartId,
+                userId: null,
               },
             ],
           },
@@ -231,4 +246,63 @@ export const removeFromCart = async (variantId: string) => {
       message: formatError(error),
     };
   }
+};
+
+export const migrateGuestCart = async (
+  sessioncartId: string,
+  userId: string
+) => {
+  return await prisma.$transaction(async (tx) => {
+    // Find guest cart with items and their variants
+    const guestCart = await tx.cart.findFirst({
+      where: {
+        sessioncartId,
+        userId: null,
+        isActive: true,
+      },
+      include: {
+        items: {
+          include: { variant: true },
+        },
+      },
+    });
+
+    if (!guestCart) return;
+
+    // Get or create user cart
+    const userCart = await getOrCreateCart(sessioncartId, userId);
+
+    // Move items to user cart
+    if (guestCart.items.length > 0) {
+      for (const guestItem of guestCart.items) {
+        // Check if item exists in user's cart
+        const userCartItem = await tx.cartItem.findFirst({
+          where: {
+            cartId: userCart.id,
+            variantId: guestItem.variantId,
+          },
+        });
+
+        if (userCartItem) {
+          // Delete existing item in user cart
+          await tx.cartItem.delete({
+            where: { id: userCartItem.id },
+          });
+        }
+
+        // Move guest cart item to user cart
+        await tx.cartItem.update({
+          where: { id: guestItem.id },
+          data: { cartId: userCart.id },
+        });
+      }
+    }
+
+    // Delete guest cart after migrating items
+    await tx.cart.delete({
+      where: { id: guestCart.id },
+    });
+
+    return { success: true };
+  });
 };

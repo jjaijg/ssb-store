@@ -9,9 +9,10 @@ erDiagram
 "Cart" {
   String id PK
   String userId FK "nullable"
-  String sessioncartId
+  String sessioncartId "nullable"
   Decimal shippingPrice
   Decimal taxPrice
+  Boolean isActive
   DateTime createdAt
   DateTime updatedAt
 }
@@ -201,6 +202,7 @@ erDiagram
   - `sessioncartId`: 
   - `shippingPrice`: 
   - `taxPrice`: 
+  - `isActive`: 
   - `createdAt`: 
   - `updatedAt`: 
 
