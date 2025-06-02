@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ZodError } from "zod";
 import { TIME_ZONE } from "./constants";
+import { prisma } from "./prisma";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -120,3 +121,38 @@ export const validateQuantity = (
     throw new Error(`Maximum order limit is ${variant.maxOrderQty}`);
   }
 };
+
+export async function generateOrderNumber(): Promise<string> {
+  // Get today's date in YYYYMMDD format
+  const date = new Date();
+  const dateString =
+    date.getFullYear().toString() +
+    (date.getMonth() + 1).toString().padStart(2, "0") +
+    date.getDate().toString().padStart(2, "0");
+
+  // Get the latest order for today
+  const latestOrder = await prisma.order.findFirst({
+    where: {
+      orderNumber: {
+        startsWith: `SSB-${dateString}`,
+      },
+    },
+    orderBy: {
+      orderNumber: "desc",
+    },
+  });
+
+  // Extract the sequence number and increment
+  let sequenceNumber = 1;
+  if (latestOrder) {
+    const lastSequence = parseInt(latestOrder.orderNumber.split("-")[2]);
+    sequenceNumber = lastSequence + 1;
+  }
+
+  // Generate the new order number
+  const orderNumber = `SSB-${dateString}-${sequenceNumber
+    .toString()
+    .padStart(4, "0")}`;
+
+  return orderNumber;
+}
