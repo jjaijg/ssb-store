@@ -125,11 +125,15 @@ erDiagram
 "addresses" {
   String id PK
   String userId FK
+  String name
+  String door
   String street
+  String landmark "nullable"
   String city
   String state
   String country
   String postalCode
+  ADDRESS_TYPE type
   Boolean isDefault
   DateTime createdAt
   DateTime updatedAt
@@ -331,11 +335,15 @@ erDiagram
 **Properties**
   - `id`: 
   - `userId`: 
+  - `name`: 
+  - `door`: 
   - `street`: 
+  - `landmark`: 
   - `city`: 
   - `state`: 
   - `country`: 
   - `postalCode`: 
+  - `type`: 
   - `isDefault`: 
   - `createdAt`: 
   - `updatedAt`: 

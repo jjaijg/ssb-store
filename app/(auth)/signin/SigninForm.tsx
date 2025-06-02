@@ -9,7 +9,7 @@ import {
 import NextLink from "next/link";
 import React, { useState } from "react";
 import SigninButton from "./SigninButton";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signinFormSchema } from "@/lib/validationSchema/user.schema";
 import { signIn } from "next-auth/react";
 
@@ -19,6 +19,9 @@ const SigninForm = () => {
     message: "",
   });
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,7 +39,11 @@ const SigninForm = () => {
       });
 
       // Sign in the user
-      await signIn("credentials", user);
+      await signIn("credentials", {
+        ...user,
+        redirect: true,
+        redirectTo: callbackUrl,
+      });
       setResult({
         success: true,
         message: "Sign in successful",

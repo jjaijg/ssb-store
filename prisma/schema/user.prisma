@@ -1,21 +1,26 @@
 model Address {
-  id         String   @id @default(cuid())
+  id         String       @id @default(cuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  door       String
   street     String
+  landmark   String?
   city       String
   state      String
   country    String
   postalCode String
-  isDefault  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  type       ADDRESS_TYPE @default(SHIPPING)
+  isDefault  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 
   // Orders using this address as shipping address
   shippingOrders Order[] @relation("ShippingAddress")
   // Orders using this address as billing address
   billingOrders  Order[] @relation("BillingAddress")
 
+  @@index([userId, type])
   @@map("addresses")
 }
 
@@ -81,4 +86,9 @@ model VerificationToken {
 enum Role {
   ADMIN
   CUSTOMER
+}
+
+enum ADDRESS_TYPE {
+  SHIPPING
+  BILLING
 }
