@@ -1,3 +1,4 @@
+import { RazorpayOptions, RazorpayResponse } from "@/types";
 import { Prisma } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -156,3 +157,23 @@ export async function generateOrderNumber(): Promise<string> {
 
   return orderNumber;
 }
+
+// Payment utilities
+
+export const initializeRazorpayPayment = (
+  options: RazorpayOptions
+): Promise<RazorpayResponse> => {
+  return new Promise((resolve, reject) => {
+    const razorpay = new window.Razorpay(options);
+
+    razorpay.on("payment.success", (response: RazorpayResponse) => {
+      resolve(response);
+    });
+
+    razorpay.on("payment.error", (err: any) => {
+      reject(err);
+    });
+
+    razorpay.open();
+  });
+};

@@ -71,12 +71,17 @@ export default function CheckoutStepper({ cart, savedAddresses }: Props) {
 
   const onSubmit = async (data: CheckoutFormData) => {
     // Handle form submission
-    console.log(data);
     try {
       const order = await createOrder(data, cart.id);
-      toast.success("Order created successfully");
+      // toast.success("Order created successfully");
+      if (data.paymentMethod === "RAZORPAY") {
+        router.push(`/checkout/payment/${order.id}`);
+      } else {
+        // COD order
+        router.push(`/checkout/success/${order.id}`);
+      }
 
-      router.push(`/orders/${order.id}`);
+      // router.push(`/orders/${order.id}`);
     } catch (error) {
       toast.error("Error while creating order");
     }

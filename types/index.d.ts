@@ -72,3 +72,61 @@ export type BannerProduct = {
     name: string;
   };
 };
+
+// Razor pay
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+export interface RazorpayOrder {
+  id: string;
+  entity: string;
+  amount: number;
+  amount_paid: number;
+  amount_due: number;
+  currency: string;
+  receipt: string;
+  status: string;
+  attempts: number;
+  created_at: number;
+}
+
+export interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  image?: string;
+  order_id: string;
+  handler: (response: RazorpayResponse) => void;
+  prefill?: {
+    name: string;
+    email: string;
+    contact: string;
+  };
+  notes?: {
+    [key: string]: string;
+  };
+  theme?: {
+    color: string;
+  };
+  method?: {
+    upi?: {
+      flow: "collect" | "intent";
+      vpa?: string;
+    };
+    netbanking?: boolean;
+    card?: boolean;
+    wallet?: boolean;
+    paylater?: boolean;
+  };
+}
+
+export interface RazorpayResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}

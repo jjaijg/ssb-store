@@ -72,11 +72,6 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
             itemDiscount = Number(item.variant.discountValue) * item.quantity;
           }
 
-          console.log({
-            subtotal: acc.subtotal + itemTotal,
-            totalDiscount: acc.totalDiscount + itemDiscount,
-          });
-
           return {
             subtotal: acc.subtotal + itemTotal,
             totalDiscount: acc.totalDiscount + itemDiscount,
