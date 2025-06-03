@@ -5,6 +5,8 @@ import {
   ProductVariant,
   CartItem,
   Cart,
+  OrderItem,
+  Order,
 } from "@prisma/client";
 
 export type SerializedProduct = Omit<Product, "rating"> & {
@@ -37,6 +39,27 @@ export type SerializedCart = Omit<Cart, "shippingPrice" | "taxPrice"> & {
   shippingPrice: number;
   taxPrice: number;
   items: SerializedCartItem[];
+};
+
+export type SerializedOrderItem = Omit<
+  OrderItem,
+  "price" | "discount" | "total"
+> & {
+  price: number;
+  discount: number;
+  total: number;
+};
+
+export type SerializedOrder = Omit<
+  Order,
+  "subtotal" | "shippingCost" | "tax" | "discount" | "total"
+> & {
+  subtotal: number;
+  shippingCost: number;
+  tax: number;
+  discount: number;
+  total: number;
+  items: SerializedOrderItem[];
 };
 
 // Home page types

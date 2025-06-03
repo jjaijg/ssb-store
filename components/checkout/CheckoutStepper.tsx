@@ -21,6 +21,9 @@ import PaymentStep from "./steps/PaymentStep";
 import ReviewStep from "./steps/ReviewStep";
 import { SerializedCart } from "@/types";
 import { Address } from "@prisma/client";
+import { createOrder } from "@/lib/actions/order.actions";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const steps = ["Shipping", "Payment", "Review"];
 
@@ -31,6 +34,8 @@ type Props = {
 
 export default function CheckoutStepper({ cart, savedAddresses }: Props) {
   const [activeStep, setActiveStep] = useState(0);
+
+  const router = useRouter();
 
   const methods = useForm({
     resolver: zodResolver(checkoutSchema),
@@ -54,12 +59,6 @@ export default function CheckoutStepper({ cart, savedAddresses }: Props) {
   });
 
   const handleNext = async () => {
-    // const isSameAsShipping = methods.getValues("sameAsShipping");
-    // if (isSameAsShipping) {
-    //   methods.setValue("billingAddress", {
-    //     ...methods.getValues("shippingAddress"),
-    //   });
-    // }
     const isValid = await methods.trigger();
     if (isValid) {
       setActiveStep((prev) => prev + 1);
@@ -72,7 +71,15 @@ export default function CheckoutStepper({ cart, savedAddresses }: Props) {
 
   const onSubmit = async (data: CheckoutFormData) => {
     // Handle form submission
-    // console.log(data);
+    console.log(data);
+    try {
+      const order = await createOrder(data, cart.id);
+      toast.success("Order created successfully");
+
+      router.push(`/orders/${order.id}`);
+    } catch (error) {
+      toast.error("Error while creating order");
+    }
   };
 
   const renderStepContent = (step: number) => {
@@ -99,16 +106,16 @@ export default function CheckoutStepper({ cart, savedAddresses }: Props) {
           ))}
         </Stepper>
 
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
-          {renderStepContent(activeStep)}
+        {renderStepContent(activeStep)}
 
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-            {activeStep !== 0 && (
-              <Button onClick={handleBack} sx={{ mr: 1 }}>
-                Back
-              </Button>
-            )}
-            {activeStep === steps.length - 1 ? (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+          {activeStep !== 0 && (
+            <Button type={"button"} onClick={handleBack} sx={{ mr: 1 }}>
+              Back
+            </Button>
+          )}
+          {activeStep === steps.length - 1 ? (
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Button
                 variant="contained"
                 type="submit"
@@ -116,17 +123,18 @@ export default function CheckoutStepper({ cart, savedAddresses }: Props) {
               >
                 Place Order
               </Button>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                disabled={methods.formState.isSubmitting}
-              >
-                Next
-              </Button>
-            )}
-          </Box>
-        </form>
+            </form>
+          ) : (
+            <Button
+              type="button"
+              variant="contained"
+              onClick={handleNext}
+              disabled={methods.formState.isSubmitting}
+            >
+              Next
+            </Button>
+          )}
+        </Box>
       </Paper>
     </FormProvider>
   );
