@@ -36,6 +36,7 @@ erDiagram
   String paymentMethod "nullable"
   String paymentId "nullable"
   Json paymentResult "nullable"
+  DateTime paidAt "nullable"
   String shippingAddressId FK
   String billingAddressId FK
   Decimal subtotal
@@ -234,6 +235,7 @@ erDiagram
   - `paymentMethod`: 
   - `paymentId`: 
   - `paymentResult`: 
+  - `paidAt`: 
   - `shippingAddressId`: 
   - `billingAddressId`: 
   - `subtotal`: 

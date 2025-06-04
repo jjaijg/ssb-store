@@ -1,11 +1,15 @@
 "use client";
 
-import { initializePayment } from "@/lib/actions/payment.actions";
+import {
+  initializePayment,
+  updateOrderStatus,
+} from "@/lib/actions/payment.actions";
 import { initializeRazorpayPayment } from "@/lib/utils";
 import { RazorpayOptions, SerializedOrder } from "@/types";
 import { Box, Button, Typography } from "@mui/material";
 import { User } from "next-auth";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 import React from "react";
 
 type Props = {
@@ -43,12 +47,21 @@ const HandlePayment = ({ order, user }: Props) => {
             });
 
             if (verifyResponse.ok) {
+              // Update order with complete payment result
+              await updateOrderStatus(
+                order.id,
+                "CONFIRMED",
+                response // Pass the complete response
+              );
               router.push(`/checkout/success/${order.id}`);
             } else {
+              // Update order with failed status
+              await updateOrderStatus(order.id, "PENDING");
               throw new Error("Payment verification failed");
             }
           } catch (error) {
             console.error("Payment verification failed:", error);
+            await updateOrderStatus(order.id, "PENDING");
             router.push(`/checkout/failed/${order.id}`);
           }
         },
@@ -74,14 +87,20 @@ const HandlePayment = ({ order, user }: Props) => {
     }
   };
   return (
-    <Box sx={{ textAlign: "center", py: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        Complete Your Payment
-      </Typography>
-      <Button variant="contained" onClick={handlePayment} size="large">
-        Pay Now
-      </Button>
-    </Box>
+    <>
+      <Script
+        id="razorpay-checkout-js"
+        src="https://checkout.razorpay.com/v1/checkout.js"
+      />
+      <Box sx={{ textAlign: "center", py: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Complete Your Payment
+        </Typography>
+        <Button variant="contained" onClick={handlePayment} size="large">
+          Pay Now
+        </Button>
+      </Box>
+    </>
   );
 };
 

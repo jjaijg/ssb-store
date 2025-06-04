@@ -7,6 +7,7 @@ import {
   Cart,
   OrderItem,
   Order,
+  Address,
 } from "@prisma/client";
 
 export type SerializedProduct = Omit<Product, "rating"> & {
@@ -49,6 +50,9 @@ export type SerializedOrderItem = Omit<
   discount: number;
   total: number;
 };
+export type SerializedOrderItemWithVariant = SerializedOrderItem & {
+  variant: SerializedProductVariant;
+};
 
 export type SerializedOrder = Omit<
   Order,
@@ -60,6 +64,12 @@ export type SerializedOrder = Omit<
   discount: number;
   total: number;
   items: SerializedOrderItem[];
+};
+
+export type SerializedOrderDetail = Omit<SerializedOrder, "items"> & {
+  items: SerializedOrderItemWithVariant[];
+  shippingAddress: Address;
+  billingAddress: Address;
 };
 
 // Home page types

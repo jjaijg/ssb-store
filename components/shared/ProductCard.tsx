@@ -178,7 +178,7 @@ export default function ProductCard({ cart, product }: ProductCardProps) {
               <ToggleButton
                 key={variant.id}
                 value={variant.id}
-                disabled={!variant.isActive || variant.stock === 0}
+                // disabled={!variant.isActive || variant.stock === 0}
                 sx={{
                   cursor:
                     !variant.isActive || variant.stock === 0
@@ -231,12 +231,16 @@ export default function ProductCard({ cart, product }: ProductCardProps) {
             {/* <IconButton size="small" color="primary">
               <Favorite />
             </IconButton> */}
-            <QuantitySelector
-              cart={cart}
-              isLoading={pending}
-              variant={selectedVariant}
-              onQuantityChange={handleQuantityChange}
-            />
+            {selectedVariant.stock > 0 ? (
+              <QuantitySelector
+                cart={cart}
+                isLoading={pending}
+                variant={selectedVariant}
+                onQuantityChange={handleQuantityChange}
+              />
+            ) : (
+              <Chip label="Out of stock" color="error" />
+            )}
           </Stack>
         </Stack>
       </CardContent>

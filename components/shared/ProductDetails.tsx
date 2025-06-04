@@ -192,6 +192,7 @@ export default function ProductDetails({ product, cart }: Props) {
               cart={cart}
               isLoading={pending}
               showLabel
+              lowStockWarning={10}
               onQuantityChange={handleQuantityChange}
             />
 

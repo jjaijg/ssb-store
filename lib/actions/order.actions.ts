@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { convertToPlainObject, generateOrderNumber } from "@/lib/utils";
 import { type CheckoutFormData } from "@/lib/validationSchema/checkout.schema";
-import { SerializedOrder } from "@/types";
+import { SerializedOrder, SerializedOrderDetail } from "@/types";
 
 export async function getOrderbyId(orderId: string) {
   try {
@@ -25,6 +25,40 @@ export async function getOrderbyId(orderId: string) {
     return convertToPlainObject<SerializedOrder>(order);
   } catch (error) {
     console.error("Error while fetching order : ", error);
+    return null;
+  }
+}
+
+export async function getOrderDetailsById(orderId: string) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return null;
+
+    const order = await prisma.order.findUnique({
+      where: {
+        id: orderId,
+        userId: session.user.id,
+      },
+      include: {
+        items: {
+          include: {
+            variant: {
+              include: {
+                product: true,
+              },
+            },
+          },
+        },
+        shippingAddress: true,
+        billingAddress: true,
+      },
+    });
+
+    if (!order) return null;
+
+    return convertToPlainObject<SerializedOrderDetail>(order);
+  } catch (error) {
+    console.error("Error while fetching user order details,", error);
     return null;
   }
 }

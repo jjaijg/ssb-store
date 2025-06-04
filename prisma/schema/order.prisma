@@ -8,6 +8,7 @@ model Order {
     paymentMethod String?
     paymentId     String? // Payment gateway reference
     paymentResult Json?         @db.Json
+    paidAt        DateTime? // Add this field for payment timestamp
 
     // Addresses
     shippingAddressId String
