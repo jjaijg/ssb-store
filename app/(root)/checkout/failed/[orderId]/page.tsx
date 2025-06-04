@@ -7,16 +7,18 @@ import { redirect } from "next/navigation";
 import HandlePayment from "@/components/checkout/HandlePayment";
 
 interface Props {
-  params: {
+  params: Promise<{
     orderId: string;
-  };
+  }>;
 }
 
 export default async function CheckoutFailedPage({ params }: Props) {
   const session = await auth();
   if (!session?.user) redirect("/signin");
 
-  const order = await getOrderbyId(params.orderId);
+  const { orderId } = await params;
+
+  const order = await getOrderbyId(orderId);
   if (!order) redirect("/");
 
   return (

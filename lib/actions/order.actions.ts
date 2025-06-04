@@ -63,6 +63,33 @@ export async function getOrderDetailsById(orderId: string) {
   }
 }
 
+export async function getUserOrders() {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
+  const orders = await prisma.order.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      items: {
+        include: {
+          variant: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return convertToPlainObject<SerializedOrderDetail[]>(orders);
+}
+
 export async function createOrder(data: CheckoutFormData, cartId: string) {
   try {
     const session = await auth();

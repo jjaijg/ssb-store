@@ -6,16 +6,18 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 interface Props {
-  params: {
+  params: Promise<{
     orderId: string;
-  };
+  }>;
 }
 
 export default async function CheckoutSuccessPage({ params }: Props) {
   const session = await auth();
   if (!session?.user) redirect("/signin");
 
-  const order = await getOrderbyId(params.orderId);
+  const { orderId } = await params;
+
+  const order = await getOrderbyId(orderId);
   if (!order) redirect("/");
 
   return (

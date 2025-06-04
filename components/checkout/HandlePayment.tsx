@@ -82,7 +82,8 @@ const HandlePayment = ({ order, user }: Props) => {
 
       await initializeRazorpayPayment(options);
     } catch (error) {
-      console.error("Payment failed:", error);
+      console.log("Payment failed:", error);
+      await updateOrderStatus(order.id, "PENDING");
       router.push(`/checkout/failed/${order.id}`);
     }
   };
