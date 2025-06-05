@@ -51,17 +51,18 @@ const HandlePayment = ({ order, user }: Props) => {
               await updateOrderStatus(
                 order.id,
                 "CONFIRMED",
+                "PAID",
                 response // Pass the complete response
               );
               router.push(`/checkout/success/${order.id}`);
             } else {
               // Update order with failed status
-              await updateOrderStatus(order.id, "PENDING");
+              await updateOrderStatus(order.id, "PENDING", "FAILED");
               throw new Error("Payment verification failed");
             }
           } catch (error) {
             console.error("Payment verification failed:", error);
-            await updateOrderStatus(order.id, "PENDING");
+            await updateOrderStatus(order.id, "PENDING", "FAILED");
             router.push(`/checkout/failed/${order.id}`);
           }
         },
@@ -83,7 +84,7 @@ const HandlePayment = ({ order, user }: Props) => {
       await initializeRazorpayPayment(options);
     } catch (error) {
       console.log("Payment failed:", error);
-      await updateOrderStatus(order.id, "PENDING");
+      await updateOrderStatus(order.id, "PENDING", "FAILED");
       router.push(`/checkout/failed/${order.id}`);
     }
   };

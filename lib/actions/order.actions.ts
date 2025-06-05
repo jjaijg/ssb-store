@@ -6,6 +6,22 @@ import { convertToPlainObject, generateOrderNumber } from "@/lib/utils";
 import { type CheckoutFormData } from "@/lib/validationSchema/checkout.schema";
 import { SerializedOrder, SerializedOrderDetail } from "@/types";
 
+export async function getOrders() {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return null;
+    const orders = await prisma.order.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return convertToPlainObject<SerializedOrder[]>(orders);
+  } catch (error) {
+    return [];
+  }
+}
+
 export async function getOrderbyId(orderId: string) {
   try {
     const session = await auth();
@@ -258,5 +274,39 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
   } catch (error) {
     console.error("Error creating order:", error);
     throw new Error("Failed to create order");
+  }
+}
+
+// For admin
+export async function getAdminOrderDetailsById(orderId: string) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || session.user.role !== "ADMIN") return null;
+
+    const order = await prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+      include: {
+        items: {
+          include: {
+            variant: {
+              include: {
+                product: true,
+              },
+            },
+          },
+        },
+        shippingAddress: true,
+        billingAddress: true,
+      },
+    });
+
+    if (!order) return null;
+
+    return convertToPlainObject<SerializedOrderDetail>(order);
+  } catch (error) {
+    console.error("Error while fetching user order details,", error);
+    return null;
   }
 }
