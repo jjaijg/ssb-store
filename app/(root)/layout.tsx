@@ -3,8 +3,6 @@ import AppHeader from "@/components/shared/header";
 import { getUserCart } from "@/lib/actions/cart.actions";
 import React, { PropsWithChildren } from "react";
 
-type Props = {};
-
 const RootLayout = async ({ children }: PropsWithChildren) => {
   const cart = await getUserCart();
   return (

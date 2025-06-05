@@ -8,7 +8,6 @@ import {
   Divider,
   Stack,
   Rating,
-  Chip,
   ToggleButtonGroup,
   ToggleButton,
   Tooltip,

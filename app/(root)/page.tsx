@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   description: "Discover amazing products at great prices",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const [
     bannerProducts,

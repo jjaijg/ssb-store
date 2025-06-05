@@ -11,11 +11,9 @@ import {
 import SearchIcon from "@mui/icons-material/SearchOutlined";
 import React from "react";
 
-type Props = {};
-
 const categories = ["All", "Pulses", "Grains", "Soaps"];
 
-const HeaderSearch = (props: Props) => {
+const HeaderSearch = () => {
   return (
     <Box
       sx={{

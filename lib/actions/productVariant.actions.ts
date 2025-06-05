@@ -28,6 +28,7 @@ export const getProductVariantsByProductId = async (productId: string) => {
       success: true,
       variants: convertToPlainObject<SerializedProductVariant[]>(variants),
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return { success: false, message: "Failed to fetch product variants" };
   }
@@ -40,6 +41,7 @@ export const getProductVariantById = async (variantId: string) => {
     });
 
     return convertToPlainObject<SerializedProductVariant>(varaint);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return null;
   }

@@ -19,10 +19,10 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
-import { MoreVert, Edit } from "@mui/icons-material";
+import { MoreVert } from "@mui/icons-material";
 import { useState } from "react";
 import { format } from "date-fns";
-import { Order, OrderStatus, PaymentStatus } from "@prisma/client";
+import { OrderStatus } from "@prisma/client";
 import { updateOrderStatus } from "@/lib/actions/payment.actions";
 import { SerializedOrder } from "@/types";
 import { useRouter } from "next/navigation";

@@ -63,7 +63,7 @@ const CategoryFormModal = (props: Props) => {
         strict: true,
       })
     );
-  }, [name]);
+  }, [form, name]);
 
   const handleSubmit = () => {
     startTransition(async () => {

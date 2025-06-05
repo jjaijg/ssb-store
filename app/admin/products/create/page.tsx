@@ -9,9 +9,7 @@ export const metadata: Metadata = {
   title: "Create Product",
 };
 
-type Props = {};
-
-const ProductCreatePage = async (props: Props) => {
+const ProductCreatePage = async () => {
   const session = await auth();
 
   // Check if the user is authenticated and has the ADMIN role

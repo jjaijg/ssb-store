@@ -12,11 +12,9 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 
-type Props = {};
-
 const categories = ["All", "Pulses", "Grains", "Soaps"];
 
-const CategoryMenu = (props: Props) => {
+const CategoryMenu = () => {
   // State to control the drawer open/close
   const [open, setOpen] = useState(false);
 

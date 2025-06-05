@@ -6,14 +6,8 @@ import { prisma } from "../prisma";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
 import { InputJsonValue } from "@prisma/client/runtime/library";
 import { convertToPlainObject } from "../utils";
-import { SerializedOrder } from "@/types";
+import { PaymentResult, SerializedOrder } from "@/types";
 import { auth } from "@/auth";
-
-interface PaymentResult {
-  razorpay_payment_id: string;
-  razorpay_order_id: string;
-  razorpay_signature: string;
-}
 
 export async function initializePayment({
   total,

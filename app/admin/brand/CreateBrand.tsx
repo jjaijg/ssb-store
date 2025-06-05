@@ -4,9 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import React, { useState } from "react";
 import BrandFormModal from "./BrandFormModal";
 
-type Props = {};
-
-const CreateBrand = (props: Props) => {
+const CreateBrand = () => {
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {

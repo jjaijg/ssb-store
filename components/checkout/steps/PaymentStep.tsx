@@ -11,8 +11,7 @@ import { type CheckoutFormData } from "@/lib/validationSchema/checkout.schema";
 import Image from "next/image";
 
 const PaymentStep = () => {
-  const { control, watch } = useFormContext<CheckoutFormData>();
-  const paymentMethod = watch("paymentMethod");
+  const { control } = useFormContext<CheckoutFormData>();
 
   return (
     <Box sx={{ mt: 2 }}>

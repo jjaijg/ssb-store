@@ -84,11 +84,13 @@ export function formatDateTiem(dateString: Date | string) {
 }
 
 // Convert prisma object to plain object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function convertToPlainObject<T>(value: any): T {
   return JSON.parse(JSON.stringify(value));
 }
 
 export function serializeDecimal<T>(obj: T): T {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const stringify = (value: any) => {
     if (value instanceof Prisma.Decimal) {
       return value.toNumber();
@@ -97,6 +99,7 @@ export function serializeDecimal<T>(obj: T): T {
   };
 
   if (Array.isArray(obj)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return obj.map((item) => serializeDecimal(item)) as any;
   }
 
@@ -164,12 +167,14 @@ export const initializeRazorpayPayment = (
   options: RazorpayOptions
 ): Promise<RazorpayResponse> => {
   return new Promise((resolve, reject) => {
-    const razorpay = new window.Razorpay(options);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const razorpay = new (window.Razorpay as any)(options);
 
     razorpay.on("payment.success", (response: RazorpayResponse) => {
       resolve(response);
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     razorpay.on("payment.error", (err: any) => {
       reject(err);
     });

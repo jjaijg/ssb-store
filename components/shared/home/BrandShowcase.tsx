@@ -18,8 +18,6 @@ export default function BrandShowcase({ brands }: Props) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
-  if (brands.length === 0) return null;
-
   useEffect(() => {
     if (scrollContainer.current) {
       const { scrollWidth, clientWidth } = scrollContainer.current;
@@ -42,6 +40,8 @@ export default function BrandShowcase({ brands }: Props) {
       behavior: "smooth",
     });
   };
+
+  if (brands.length === 0) return null;
 
   return (
     <Box

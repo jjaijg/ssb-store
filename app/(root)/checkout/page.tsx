@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description: "Complete your purchase",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function CheckoutPage() {
   const session = await auth();
 
@@ -18,14 +20,14 @@ export default async function CheckoutPage() {
     redirect("/signin?callbackUrl=/checkout");
   }
 
-  let [cart, savedAddresses] = await Promise.all([
+  const [cart, addresses] = await Promise.all([
     getUserCart(),
     getSavedAddresses(),
   ]);
 
   if (!cart) return notFound();
 
-  savedAddresses = savedAddresses || {
+  const savedAddresses = addresses || {
     shippingAddresses: [],
     billingAddresses: [],
   };

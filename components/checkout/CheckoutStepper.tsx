@@ -1,15 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Stepper,
-  Step,
-  StepLabel,
-  Box,
-  Button,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Stepper, Step, StepLabel, Box, Button, Paper } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -82,7 +74,8 @@ export default function CheckoutStepper({ cart, savedAddresses }: Props) {
       }
 
       // router.push(`/orders/${order.id}`);
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
       toast.error("Error while creating order");
     }
   };

@@ -7,7 +7,7 @@ import {
   updateProductSchema,
 } from "../validationSchema/product.schema";
 import { auth } from "@/auth";
-import { convertToPlainObject, formatError, serializeDecimal } from "../utils";
+import { convertToPlainObject, formatError } from "../utils";
 import {
   BannerProduct,
   SerializedProduct,
@@ -30,6 +30,7 @@ export const getProductBySlug = async (slug: string) => {
     if (!product) return null;
 
     return convertToPlainObject<SerializedProductWithVariants>(product);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return null;
   }
@@ -50,6 +51,7 @@ export const getAllProductsWithVariants = async () => {
     });
 
     return { success: true, products };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return { success: false, message: "Failed to fetch products" };
   }
@@ -71,6 +73,7 @@ export const getProductswithVariants = async ({
     });
 
     return convertToPlainObject<SerializedProductWithVariants[]>(products);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return [] as SerializedProductWithVariants[];
   }
@@ -103,7 +106,7 @@ export const createProductWithoutVariants = async (
     }
 
     // If the product does not exist, proceed to create it
-    const product = await prisma.product.create({
+    await prisma.product.create({
       data: { ...data, createdBy: session.user.id },
     });
 
@@ -160,6 +163,7 @@ export const getProductById = async (id: string) => {
     }
 
     return convertToPlainObject<SerializedProduct>(product);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return null; // Handle error appropriately
   }

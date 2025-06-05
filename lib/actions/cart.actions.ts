@@ -87,7 +87,8 @@ export const getUserCart = async () => {
     if (!cart) return null;
 
     return convertToPlainObject<SerializedCart>(cart);
-  } catch (error) {
+  } catch (e) {
+    console.error(e);
     return null;
   }
 };

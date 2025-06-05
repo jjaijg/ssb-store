@@ -5,7 +5,7 @@ import {
   updateOrderStatus,
 } from "@/lib/actions/payment.actions";
 import { initializeRazorpayPayment } from "@/lib/utils";
-import { RazorpayOptions, SerializedOrder } from "@/types";
+import { PaymentResult, RazorpayOptions, SerializedOrder } from "@/types";
 import { Box, Button, Typography } from "@mui/material";
 import { User } from "next-auth";
 import { useRouter } from "next/navigation";
@@ -39,7 +39,7 @@ const HandlePayment = ({ order, user }: Props) => {
           email: user.email || "",
           contact: "admin@ssb.in",
         },
-        handler: async (response: any) => {
+        handler: async (response: PaymentResult) => {
           try {
             const verifyResponse = await fetch("/api/verify", {
               method: "POST",

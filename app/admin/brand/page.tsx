@@ -6,9 +6,7 @@ import BrandTable from "./BrandTable";
 import CreateBrand from "./CreateBrand";
 import { getAllBrandsAction } from "@/lib/actions/brand.actions";
 
-type Props = {};
-
-const BrandPage = async (props: Props) => {
+const BrandPage = async () => {
   const session = await auth();
 
   // Check if the user is authenticated and has the ADMIN role

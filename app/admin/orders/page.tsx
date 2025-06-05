@@ -4,9 +4,7 @@ import React from "react";
 import OrdersTable from "./OrdersTable";
 import { getOrders } from "@/lib/actions/order.actions";
 
-type Props = {};
-
-const AdminOrdersPage = async (props: Props) => {
+const AdminOrdersPage = async () => {
   const session = await auth();
 
   // Check if the user is authenticated and has the ADMIN role

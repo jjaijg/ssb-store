@@ -22,8 +22,6 @@ export default function FeaturedCategories({ categories }: Props) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
-  if (categories.length === 0) return null;
-
   useEffect(() => {
     if (scrollContainer.current) {
       const { scrollWidth, clientWidth } = scrollContainer.current;
@@ -48,6 +46,8 @@ export default function FeaturedCategories({ categories }: Props) {
       behavior: "smooth",
     });
   };
+
+  if (categories.length === 0) return null;
 
   return (
     <Box

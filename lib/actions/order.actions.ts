@@ -18,6 +18,7 @@ export async function getOrders() {
 
     return convertToPlainObject<SerializedOrder[]>(orders);
   } catch (error) {
+    console.error("Error fetching orders : ", error);
     return [];
   }
 }

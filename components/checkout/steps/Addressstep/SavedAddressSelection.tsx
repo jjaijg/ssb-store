@@ -5,7 +5,7 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { type Address } from "@prisma/client";
 import { type CheckoutFormData } from "@/lib/validationSchema/checkout.schema";
 import { AddressSummary } from "./AddressSummary";
@@ -19,7 +19,7 @@ export const SavedAddressSelection = ({
   prefix,
   savedAddresses,
 }: SavedAddressSelectionProps) => {
-  const { watch, setValue, getValues } = useFormContext<CheckoutFormData>();
+  const { watch, setValue } = useFormContext<CheckoutFormData>();
 
   const addressId = watch(`${prefix}.id`);
 

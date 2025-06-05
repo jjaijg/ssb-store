@@ -2,7 +2,7 @@
 
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { OrderStatus, PaymentStatus, type Order } from "@prisma/client";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 interface Props {
   orderId: string;

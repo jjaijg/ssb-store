@@ -14,7 +14,6 @@ import {
   TableRow,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 import DeleteDialog from "@/components/delete-dialog";
@@ -98,6 +97,7 @@ const ProductVariantsTable = ({ variants }: Props) => {
                   <AvatarGroup max={4} spacing={"small"}>
                     {variant.images.map((img) => (
                       <Avatar
+                        key={variant.variantName}
                         alt={variant.variantName}
                         src={img}
                         sx={{ border: "2px solid #0030499e !important" }}

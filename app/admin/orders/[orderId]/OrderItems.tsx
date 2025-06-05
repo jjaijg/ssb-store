@@ -1,4 +1,4 @@
-import { SerializedOrderDetail, SerializedOrderItemWithVariant } from "@/types";
+import { SerializedOrderItemWithVariant } from "@/types";
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
 

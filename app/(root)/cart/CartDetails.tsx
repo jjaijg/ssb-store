@@ -1,12 +1,4 @@
-import {
-  Box,
-  Container,
-  Grid,
-  Typography,
-  Paper,
-  Divider,
-  Button,
-} from "@mui/material";
+import { Container, Grid, Typography } from "@mui/material";
 import { ShoppingCart } from "@mui/icons-material";
 import { SerializedCart } from "@/types";
 import CartItems from "@/components/shared/cart/CartItems";

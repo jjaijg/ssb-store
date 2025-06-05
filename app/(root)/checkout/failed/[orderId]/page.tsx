@@ -45,12 +45,12 @@ export default async function CheckoutFailedPage({ params }: Props) {
           </Typography>
 
           <Typography variant="body1" color="text.secondary" paragraph>
-            We couldn't process your payment for order #{order.orderNumber}
+            We couldn&apos;t process your payment for order #{order.orderNumber}
           </Typography>
 
           <Box sx={{ my: 4 }}>
             <Typography variant="body2" color="text.secondary" paragraph>
-              Don't worry, your order is saved. You can:
+              Don&apos;t worry, your order is saved. You can:
             </Typography>
             <Box sx={{ mt: 3 }}>
               <HandlePayment order={order} user={session.user} />

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -64,7 +64,7 @@ export const AddressStep = ({ savedAddresses }: Props) => {
         );
       });
     }
-  }, [shippingAddress, watch("sameAsShipping"), setValue]);
+  }, [shippingAddress, setValue, watch]);
 
   return (
     <Box sx={{ mt: 2 }}>

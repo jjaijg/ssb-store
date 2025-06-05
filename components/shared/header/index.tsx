@@ -1,7 +1,7 @@
 import React from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { AppBar, Button, Toolbar } from "@mui/material";
+import { AppBar, Toolbar } from "@mui/material";
 import Image from "next/image";
 import HeaderSearch from "./HeaderSearch";
 import CategoryMenu from "./CategoryMenu";

@@ -1,14 +1,5 @@
 "use client";
-import {
-  Alert,
-  Box,
-  Button,
-  IconButton,
-  Snackbar,
-  Stack,
-  TextField,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { Alert, Box, Button, Snackbar, Stack, TextField } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -17,9 +8,7 @@ import { updateProfileSchema } from "@/lib/validationSchema/user.schema";
 import { z } from "zod";
 import { updateProfileAction } from "@/lib/actions/user.actions";
 
-type Props = {};
-
-const ProfileForm = (props: Props) => {
+const ProfileForm = () => {
   const { data: session, update } = useSession();
   const [result, setResult] = useState({
     success: false,

@@ -63,7 +63,7 @@ const BrandFormModal = (props: Props) => {
         strict: true,
       })
     );
-  }, [name]);
+  }, [form, name]);
 
   const handleSubmit = () => {
     setResult({ success: false, message: "" });

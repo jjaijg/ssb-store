@@ -83,10 +83,17 @@ export type BannerProduct = {
   };
 };
 
+// Payment
+export interface PaymentResult {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
 // Razor pay
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: unknown;
   }
 }
 

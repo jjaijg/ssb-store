@@ -22,9 +22,6 @@ type Props = {
 export default function HeroSection({ products }: Props) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Don't render if no banner products
-  if (products.length === 0) return null;
-
   // Auto-advance slides
   useEffect(() => {
     const timer = setInterval(() => {
@@ -40,6 +37,9 @@ export default function HeroSection({ products }: Props) {
   const handleNextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % products.length);
   };
+
+  // Don't render if no banner products
+  if (products.length === 0) return null;
 
   return (
     <Box

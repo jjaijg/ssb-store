@@ -1,9 +1,6 @@
 "use client";
 import { UploadButton } from "@/lib/uploadthing";
-import {
-  createProductVariantSchema,
-  updateProductVariantSchema,
-} from "@/lib/validationSchema/product.schema";
+import { createProductVariantSchema } from "@/lib/validationSchema/product.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Box,
@@ -24,7 +21,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { DiscountType } from "@prisma/client";
 import Image from "next/image";
-import React, { useEffect, useTransition } from "react";
+import React, { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";

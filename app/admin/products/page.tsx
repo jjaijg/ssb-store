@@ -12,9 +12,7 @@ export const metadata: Metadata = {
   description: "Manage products in the admin panel",
 };
 
-type Props = {};
-
-const ProductsPage = async (props: Props) => {
+const ProductsPage = async () => {
   const session = await auth();
 
   // Check if the user is authenticated and has the ADMIN role

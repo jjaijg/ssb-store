@@ -6,9 +6,7 @@ import React from "react";
 import CategoryTable from "./CategoryTable";
 import CreateCategory from "./CreateCategory";
 
-type Props = {};
-
-const CategoryPage = async (props: Props) => {
+const CategoryPage = async () => {
   const session = await auth();
 
   // Check if the user is authenticated and has the ADMIN role

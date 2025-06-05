@@ -1,12 +1,13 @@
 import { auth } from "@/auth";
-import { Box, Card, CardHeader } from "@mui/material";
+import { Card, CardHeader } from "@mui/material";
 import React from "react";
 import ProfileForm from "./profile-form";
 
-type Props = {};
-
-const UserProfilePage = async (props: Props) => {
+const UserProfilePage = async () => {
   const session = await auth();
+
+  if (!session) throw new Error("Unauthorized");
+
   return (
     <Card
       sx={{

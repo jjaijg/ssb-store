@@ -1,5 +1,4 @@
 "use client";
-import { updateCategoryAction } from "@/lib/actions/category.actions";
 import { UploadButton } from "@/lib/uploadthing";
 import {
   createProductSchema,
@@ -85,7 +84,7 @@ const ProductForm = (props: Props) => {
         strict: true,
       })
     );
-  }, [name]);
+  }, [form, name]);
 
   const handlebannerImageDelete = async () => {
     if (bannerImage) {

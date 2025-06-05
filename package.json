@@ -53,6 +53,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
     "bufferutil": "^4.0.9",
     "dotenv": "^16.5.0",
     "eslint": "^9",

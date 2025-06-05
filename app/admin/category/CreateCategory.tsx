@@ -4,9 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import React, { useState } from "react";
 import CategoryFormModal from "./CategoryFormModal";
 
-type Props = {};
-
-const CreateCategory = (props: Props) => {
+const CreateCategory = () => {
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {

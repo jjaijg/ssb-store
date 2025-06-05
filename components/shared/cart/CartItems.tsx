@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { Add, Remove, Delete } from "@mui/icons-material";
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { SerializedCartItem } from "@/types";
 import { addToCart, removeFromCart } from "@/lib/actions/cart.actions";
 import { toast } from "react-toastify";

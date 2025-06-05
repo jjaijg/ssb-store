@@ -16,8 +16,6 @@ export default function FeaturedProducts({ products, cart }: Props) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
-  if (products.length === 0) return null;
-
   useEffect(() => {
     if (scrollContainer.current) {
       const { scrollWidth, clientWidth } = scrollContainer.current;
@@ -42,6 +40,8 @@ export default function FeaturedProducts({ products, cart }: Props) {
       behavior: "smooth",
     });
   };
+
+  if (products.length === 0) return null;
 
   return (
     <Box component="section" sx={{ py: { xs: 4, md: 8 } }}>

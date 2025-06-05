@@ -19,7 +19,7 @@ export default function EmptyCart() {
           Your cart is empty
         </Typography>
         <Typography color="text.secondary" component={"p"} mb={2}>
-          Looks like you haven't added any items to your cart yet.
+          Looks like you haven&apos;t added any items to your cart yet.
         </Typography>
         <Button component={Link} href="/" variant="contained" size="large">
           Continue Shopping

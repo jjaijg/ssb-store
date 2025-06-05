@@ -52,7 +52,7 @@ export default async function CheckoutSuccessPage({ params }: Props) {
               Order #{order.orderNumber}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              We'll send you a confirmation email with your order details
+              We&apos;ll send you a confirmation email with your order details
             </Typography>
           </Box>
 

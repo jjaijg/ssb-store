@@ -9,7 +9,7 @@ import {
 import NextLink from "next/link";
 import React, { useState } from "react";
 import SigninButton from "./SigninButton";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signinFormSchema } from "@/lib/validationSchema/user.schema";
 import { signIn } from "next-auth/react";
 
@@ -18,7 +18,6 @@ const SigninForm = () => {
     success: false,
     message: "",
   });
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const callbackUrl = searchParams.get("callbackUrl") || "/";

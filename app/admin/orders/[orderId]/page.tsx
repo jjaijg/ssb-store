@@ -1,8 +1,5 @@
 import { auth } from "@/auth";
-import {
-  getAdminOrderDetailsById,
-  getOrderDetailsById,
-} from "@/lib/actions/order.actions";
+import { getAdminOrderDetailsById } from "@/lib/actions/order.actions";
 import {
   Box,
   Chip,
