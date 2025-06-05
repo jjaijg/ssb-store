@@ -130,7 +130,7 @@ export default function FeaturedCategories({ categories }: Props) {
                 }}
               >
                 <Image
-                  src={category.image || "/images/placeholder.png"}
+                  src={category.image || "/images/placeholder_300_300.webp"}
                   alt={category.name}
                   fill
                   className="category-image"

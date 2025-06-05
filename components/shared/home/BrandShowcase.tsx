@@ -126,7 +126,7 @@ export default function BrandShowcase({ brands }: Props) {
                 }}
               >
                 <Image
-                  src={brand.logoUrl || "/images/placeholder-logo.png"}
+                  src={brand.logoUrl || "/images/placeholder_200_200.webp"}
                   alt={brand.name}
                   fill
                   style={{
