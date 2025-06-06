@@ -16,6 +16,7 @@ import { Address } from "@prisma/client";
 import { createOrder } from "@/lib/actions/order.actions";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { DEFAULT_CHECKOUT_DATA } from "@/lib/constants";
 
 const steps = ["Shipping", "Payment", "Review"];
 
@@ -32,22 +33,7 @@ export default function CheckoutStepper({ cart, savedAddresses }: Props) {
   const methods = useForm({
     resolver: zodResolver(checkoutSchema),
     mode: "onChange",
-    defaultValues: {
-      sameAsShipping: true,
-      paymentMethod: "RAZORPAY",
-      shippingAddress: {
-        type: "SHIPPING",
-        state: "Tamil Nadu",
-        country: "India",
-        isDefault: false,
-      },
-      billingAddress: {
-        type: "BILLING",
-        state: "Tamil Nadu",
-        country: "India",
-        isDefault: false,
-      },
-    },
+    defaultValues: { ...DEFAULT_CHECKOUT_DATA },
   });
 
   const handleNext = async () => {

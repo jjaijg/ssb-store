@@ -31,7 +31,9 @@ export const addressSchema = z.object({
     .string()
     .min(1, "Postal code is required")
     .max(7, { message: "Postal code should not be greater than 7 characters" }),
-  type: z.enum([ADDRESS_TYPE.SHIPPING, ADDRESS_TYPE.BILLING]),
+  type: z.enum([ADDRESS_TYPE.SHIPPING, ADDRESS_TYPE.BILLING], {
+    message: "Address type is required",
+  }),
 });
 
 export const checkoutSchema = z.object({

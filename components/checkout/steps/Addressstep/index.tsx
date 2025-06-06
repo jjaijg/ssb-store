@@ -12,14 +12,16 @@ import { type CheckoutFormData } from "@/lib/validationSchema/checkout.schema";
 import { type Address } from "@prisma/client";
 import { AddressFields } from "./AddressFields";
 import { SavedAddressSelection } from "./SavedAddressSelection";
+import { DEFAULT_CHECKOUT_DATA } from "@/lib/constants";
 
 interface Props {
   savedAddresses: { shippingAddresses: Address[]; billingAddresses: Address[] };
 }
 
 export const AddressStep = ({ savedAddresses }: Props) => {
-  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
-  const { watch, setValue, reset } = useFormContext<CheckoutFormData>();
+  const [showNewShipAddressForm, setShowNewShipAddressForm] = useState(false);
+  const [showNewBillAddressForm, setShowBillNewAddressForm] = useState(false);
+  const { watch, setValue } = useFormContext<CheckoutFormData>();
 
   const showBillingAddress = !watch("sameAsShipping");
   const shippingAddress = watch("shippingAddress");
@@ -75,8 +77,10 @@ export const AddressStep = ({ savedAddresses }: Props) => {
           <Button
             startIcon={<AddIcon />}
             onClick={() => {
-              setShowNewAddressForm(true);
-              reset();
+              setShowNewShipAddressForm(true);
+              setValue("shippingAddress", {
+                ...DEFAULT_CHECKOUT_DATA.shippingAddress,
+              });
             }}
             sx={{ my: 2 }}
           >
@@ -85,7 +89,7 @@ export const AddressStep = ({ savedAddresses }: Props) => {
         </>
       )}
 
-      {((showNewAddressForm && !shippingAddress.id) ||
+      {((showNewShipAddressForm && !shippingAddress.id) ||
         savedAddresses.shippingAddresses.length === 0) && (
         <AddressFields prefix="shippingAddress" />
       )}
@@ -114,12 +118,29 @@ export const AddressStep = ({ savedAddresses }: Props) => {
             Billing Address
           </Typography>
           {savedAddresses.billingAddresses.length > 0 && (
-            <SavedAddressSelection
-              prefix="billingAddress"
-              savedAddresses={savedAddresses.billingAddresses}
-            />
+            <>
+              <SavedAddressSelection
+                prefix="billingAddress"
+                savedAddresses={savedAddresses.billingAddresses}
+              />
+              <Button
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setShowBillNewAddressForm(true);
+                  setValue(
+                    "billingAddress",
+                    DEFAULT_CHECKOUT_DATA.billingAddress
+                      ? DEFAULT_CHECKOUT_DATA.billingAddress
+                      : undefined
+                  );
+                }}
+                sx={{ my: 2 }}
+              >
+                Add New Address
+              </Button>
+            </>
           )}
-          {((showNewAddressForm && !billingAddress?.id) ||
+          {((showNewBillAddressForm && !billingAddress?.id) ||
             savedAddresses.billingAddresses.length === 0) && (
             <AddressFields prefix="billingAddress" />
           )}

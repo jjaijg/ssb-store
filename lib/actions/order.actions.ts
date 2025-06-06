@@ -190,6 +190,7 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
             NOT: {
               id: data.shippingAddress.id,
             },
+            type: "SHIPPING",
           },
           data: {
             isDefault: false,
@@ -229,6 +230,7 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
               NOT: {
                 id: data.billingAddress.id,
               },
+              type: "BILLING",
             },
             data: {
               isDefault: false,
