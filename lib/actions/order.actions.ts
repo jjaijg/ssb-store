@@ -183,6 +183,20 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
         data.shippingAddress.id = addr.id;
       }
 
+      // if current address is default, reset other addresses
+      if (data.shippingAddress.isDefault) {
+        await tx.address.updateMany({
+          where: {
+            NOT: {
+              id: data.shippingAddress.id,
+            },
+          },
+          data: {
+            isDefault: false,
+          },
+        });
+      }
+
       if (!data.sameAsShipping) {
         if (data.billingAddress && !data.billingAddress.id) {
           const addr = await tx.address.create({
@@ -206,6 +220,20 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
           });
 
           data.billingAddress.id = addr.id;
+        }
+
+        // if current address is default, reset other addresses
+        if (data.billingAddress && data.billingAddress.isDefault) {
+          await tx.address.updateMany({
+            where: {
+              NOT: {
+                id: data.billingAddress.id,
+              },
+            },
+            data: {
+              isDefault: false,
+            },
+          });
         }
       }
 
