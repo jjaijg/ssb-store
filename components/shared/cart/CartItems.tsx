@@ -195,7 +195,14 @@ export default function CartItems({ items }: Props) {
                   <IconButton
                     size="small"
                     onClick={() => handleQuantityChange(item, "add")}
-                    disabled={pending}
+                    disabled={
+                      pending ||
+                      item.quantity >=
+                        Math.min(
+                          item.variant.maxOrderQty ?? Infinity,
+                          item.variant.stock
+                        )
+                    }
                   >
                     <Add />
                   </IconButton>
