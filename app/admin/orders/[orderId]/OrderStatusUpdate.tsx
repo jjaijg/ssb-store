@@ -49,7 +49,7 @@ export default function OrderStatusUpdate({
         if (!confirmed) return;
       }
 
-      await updateOrderStatus(orderId, status);
+      await updateOrderStatus(orderId, status, {});
       router.refresh();
     } catch (error) {
       console.error("Failed to update order status:", error);
@@ -59,7 +59,10 @@ export default function OrderStatusUpdate({
 
   const handleUpdatePaidDate = async () => {
     try {
-      await updateOrderStatus(orderId, currentStatus);
+      await updateOrderStatus(orderId, currentStatus, {
+        paymentStatus: "PAID",
+        paidAt: new Date(paidDate),
+      });
       setOpenDialog(false);
       router.refresh();
     } catch (error) {

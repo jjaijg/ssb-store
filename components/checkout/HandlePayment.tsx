@@ -5,7 +5,12 @@ import {
   updateOrderStatus,
 } from "@/lib/actions/payment.actions";
 import { initializeRazorpayPayment } from "@/lib/utils";
-import { PaymentResult, RazorpayOptions, SerializedOrder } from "@/types";
+import {
+  PaymentErrorResult,
+  PaymentResult,
+  RazorpayOptions,
+  SerializedOrder,
+} from "@/types";
 import { Box, Button, Typography } from "@mui/material";
 import { User } from "next-auth";
 import { useRouter } from "next/navigation";
@@ -51,18 +56,28 @@ const HandlePayment = ({ order, user }: Props) => {
               await updateOrderStatus(
                 order.id,
                 "CONFIRMED",
-                "PAID",
-                response // Pass the complete response
+                {
+                  paymentStatus: "PAID",
+                  paidAt: new Date(),
+                  paymentResult: response,
+                } // Pass the complete response
               );
               router.push(`/checkout/success/${order.id}`);
             } else {
+              const resp = await verifyResponse.json();
               // Update order with failed status
-              await updateOrderStatus(order.id, "PENDING", "FAILED");
+              await updateOrderStatus(order.id, "PENDING", {
+                paymentStatus: "FAILED",
+                paymentResult: resp,
+              });
               throw new Error("Payment verification failed");
             }
           } catch (error) {
             console.error("Payment verification failed:", error);
-            await updateOrderStatus(order.id, "PENDING", "FAILED");
+            await updateOrderStatus(order.id, "PENDING", {
+              paymentStatus: "FAILED",
+              paymentResult: { message: (error as Error).message },
+            });
             router.push(`/checkout/failed/${order.id}`);
           }
         },
@@ -76,16 +91,16 @@ const HandlePayment = ({ order, user }: Props) => {
           wallet: false,
           paylater: false,
         },
-        // theme: {
-        //   color: "#1976d2",
-        // },
       } satisfies RazorpayOptions;
 
       await initializeRazorpayPayment(options);
     } catch (error) {
       console.log("Payment failed:", error);
-      await updateOrderStatus(order.id, "PENDING", "FAILED");
-      router.push(`/checkout/failed/${order.id}`);
+      await updateOrderStatus(order.id, "PENDING", {
+        paymentStatus: "FAILED",
+        paymentResult: error as PaymentErrorResult,
+      });
+      // router.push(`/checkout/failed/${order.id}`);
     }
   };
   return (

@@ -67,7 +67,7 @@ export default function OrdersTable({ orders }: Props) {
         if (!confirmed) return;
       }
 
-      await updateOrderStatus(selectedOrder.id, status);
+      await updateOrderStatus(selectedOrder.id, status, {});
       // Refresh the page to show updated data
       window.location.reload();
     } catch (error) {
@@ -80,7 +80,10 @@ export default function OrdersTable({ orders }: Props) {
     if (!selectedOrder) return;
 
     try {
-      await updateOrderStatus(selectedOrder.id, "CONFIRMED");
+      await updateOrderStatus(selectedOrder.id, "CONFIRMED", {
+        paymentStatus: "PAID",
+        paidAt: new Date(paidDate),
+      });
       setOpenDialog(false);
       //   window.location.reload();
       router.refresh();

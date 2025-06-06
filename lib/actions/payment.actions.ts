@@ -40,8 +40,11 @@ export async function initializePayment({
 export async function updateOrderStatus(
   orderId: string,
   status: OrderStatus,
-  paymentStatus?: PaymentStatus,
-  paymentResult?: PaymentResult
+  paymentDetails: {
+    paymentStatus?: PaymentStatus;
+    paymentResult?: unknown;
+    paidAt?: Date;
+  }
 ) {
   try {
     const session = await auth();
@@ -58,18 +61,20 @@ export async function updateOrderStatus(
 
     if (!order) throw new Error("Order not found");
 
+    const { paymentStatus, paymentResult, paidAt } = paymentDetails;
+    const paymentId = paymentResult
+      ? (paymentResult as PaymentResult)?.razorpay_payment_id ?? undefined
+      : undefined;
     const updatedOrder = await prisma.$transaction(async (tx) => {
       // Start transaction to update both order and stock
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
           status: status,
-          ...(paymentStatus ? { paymentStatus: paymentStatus } : {}),
-          ...(paymentResult && {
-            paymentId: paymentResult.razorpay_payment_id,
-            paymentResult: paymentResult as unknown as InputJsonValue,
-            paidAt: new Date(),
-          }),
+          paymentStatus,
+          paymentResult: paymentResult as unknown as InputJsonValue,
+          paidAt,
+          ...(paymentId ? { paymentId } : {}),
         },
         include: {
           items: true,
