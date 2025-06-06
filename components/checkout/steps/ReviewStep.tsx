@@ -92,7 +92,7 @@ const ReviewStep = ({ cart }: Props) => {
             address={formData.shippingAddress}
           />
         </Grid>
-        {!formData.sameAsShipping && (
+        {!formData.sameAsShipping && formData.billingAddress && (
           <Grid size={{ xs: 12, md: 6 }}>
             <AddressSummary
               title="Billing Address"
