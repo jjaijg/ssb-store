@@ -159,37 +159,54 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
       );
 
       // 3. create addresses
-      const shippingAddress = await tx.address.upsert({
-        where: {
-          id: data.shippingAddress.id,
-        },
-        create: {
-          ...data.shippingAddress,
-          userId: session.user.id,
-          type: "SHIPPING",
-        },
-        update: {
-          ...data.shippingAddress,
-          isDefault: data.shippingAddress.isDefault,
-        },
-      });
-
-      let billingAddress = null;
-      if (!data.sameAsShipping) {
-        billingAddress = await tx.address.upsert({
-          where: {
-            id: data.billingAddress.id,
-          },
-          create: {
-            ...data.billingAddress,
+      if (!data.shippingAddress.id) {
+        const addr = await tx.address.create({
+          data: {
+            ...data.shippingAddress,
+            type: "SHIPPING",
             userId: session.user.id,
-            type: "BILLING",
-          },
-          update: {
-            ...data.billingAddress,
-            isDefault: data.billingAddress.isDefault,
           },
         });
+        data.shippingAddress.id = addr.id;
+      } else {
+        const addr = await tx.address.update({
+          where: {
+            id: data.shippingAddress.id,
+            userId: session.user.id,
+          },
+          data: {
+            ...data.shippingAddress,
+            isDefault: data.shippingAddress.isDefault,
+          },
+        });
+
+        data.shippingAddress.id = addr.id;
+      }
+
+      if (!data.sameAsShipping) {
+        if (!data.billingAddress.id) {
+          const addr = await tx.address.create({
+            data: {
+              ...data.billingAddress,
+              type: "SHIPPING",
+              userId: session.user.id,
+            },
+          });
+          data.billingAddress.id = addr.id;
+        } else {
+          const addr = await tx.address.update({
+            where: {
+              id: data.billingAddress.id,
+              userId: session.user.id,
+            },
+            data: {
+              ...data.billingAddress,
+              isDefault: data.billingAddress.isDefault,
+            },
+          });
+
+          data.billingAddress.id = addr.id;
+        }
       }
 
       // Calculate shipping cost and tax
@@ -210,10 +227,10 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
           shippingCost,
           tax,
           total,
-          shippingAddressId: shippingAddress.id,
-          billingAddressId: billingAddress
-            ? billingAddress.id
-            : shippingAddress.id,
+          shippingAddressId: data.shippingAddress.id,
+          billingAddressId: data.sameAsShipping
+            ? data.shippingAddress.id!
+            : data.billingAddress.id!,
           items: {
             create: cart.items.map((item) => {
               const itemPrice = Number(item.variant.price);
