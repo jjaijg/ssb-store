@@ -3,18 +3,12 @@ import { z } from "zod";
 
 export const addressSchema = z.object({
   id: z.string().optional(), // Add this to handle saved addresses
-  name: z
-    .string()
-    .min(1, "Address type is required")
-    .max(20, {
-      message: "Address type should not be greater than 20 characters",
-    }),
-  door: z
-    .string()
-    .min(1, "Resident details required")
-    .max(30, {
-      message: "Resident details should not be greater than 30 characters",
-    }),
+  name: z.string().min(1, "Address type is required").max(20, {
+    message: "Address type should not be greater than 20 characters",
+  }),
+  door: z.string().min(1, "Resident details required").max(30, {
+    message: "Resident details should not be greater than 30 characters",
+  }),
   street: z
     .string()
     .min(1, "Street is required")
@@ -42,10 +36,20 @@ export const addressSchema = z.object({
 
 export const checkoutSchema = z.object({
   shippingAddress: addressSchema,
-  billingAddress: addressSchema,
+  billingAddress: addressSchema.optional(),
   sameAsShipping: z.boolean().default(true),
   paymentMethod: z.enum(["RAZORPAY", "COD"]),
   notes: z.string().optional(),
 });
+// .refine(
+//   ({ sameAsShipping, billingAddress }) => {
+//     if (!sameAsShipping && !billingAddress) return false;
+//     return true;
+//   },
+//   {
+//     message: "Billing address details required",
+//     path: ["billingAddress", "name"],
+//   }
+// );
 
 export type CheckoutFormData = z.infer<typeof checkoutSchema>;

@@ -55,16 +55,10 @@ export const AddressStep = ({ savedAddresses }: Props) => {
   }, [savedAddresses, setValue]);
 
   useEffect(() => {
-    const isSameAsShipping = watch("sameAsShipping");
-    if (isSameAsShipping && shippingAddress) {
-      Object.keys(shippingAddress).forEach((key) => {
-        setValue(
-          `billingAddress.${key as keyof typeof shippingAddress}`,
-          shippingAddress[key as keyof typeof shippingAddress]
-        );
-      });
+    if (!showBillingAddress) {
+      setValue("billingAddress", undefined);
     }
-  }, [shippingAddress, setValue, watch]);
+  }, [showBillingAddress, setValue]);
 
   return (
     <Box sx={{ mt: 2 }}>
@@ -125,7 +119,7 @@ export const AddressStep = ({ savedAddresses }: Props) => {
               savedAddresses={savedAddresses.billingAddresses}
             />
           )}
-          {((showNewAddressForm && !billingAddress.id) ||
+          {((showNewAddressForm && !billingAddress?.id) ||
             savedAddresses.billingAddresses.length === 0) && (
             <AddressFields prefix="billingAddress" />
           )}

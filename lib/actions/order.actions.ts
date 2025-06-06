@@ -184,16 +184,16 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
       }
 
       if (!data.sameAsShipping) {
-        if (!data.billingAddress.id) {
+        if (data.billingAddress && !data.billingAddress.id) {
           const addr = await tx.address.create({
             data: {
               ...data.billingAddress,
-              type: "SHIPPING",
+              type: "BILLING",
               userId: session.user.id,
             },
           });
           data.billingAddress.id = addr.id;
-        } else {
+        } else if (data.billingAddress && data.billingAddress.id) {
           const addr = await tx.address.update({
             where: {
               id: data.billingAddress.id,
@@ -230,7 +230,7 @@ export async function createOrder(data: CheckoutFormData, cartId: string) {
           shippingAddressId: data.shippingAddress.id,
           billingAddressId: data.sameAsShipping
             ? data.shippingAddress.id!
-            : data.billingAddress.id!,
+            : data.billingAddress!.id!,
           items: {
             create: cart.items.map((item) => {
               const itemPrice = Number(item.variant.price);

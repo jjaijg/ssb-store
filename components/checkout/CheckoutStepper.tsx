@@ -33,7 +33,7 @@ export default function CheckoutStepper({ cart, savedAddresses }: Props) {
     resolver: zodResolver(checkoutSchema),
     mode: "onChange",
     defaultValues: {
-      sameAsShipping: false,
+      sameAsShipping: true,
       paymentMethod: "RAZORPAY",
       shippingAddress: {
         type: "SHIPPING",
