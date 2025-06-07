@@ -162,7 +162,7 @@ const UserOrderPage = async ({ params }: Props) => {
                 <PayNowButton
                   orderId={order.id}
                   orderStatus={order.status}
-                  paymentMethod={order.paymentMethod}
+                  paymentMethod={order.paymentMethod!}
                   paymentStatus={order.paymentStatus}
                 />
               </CardContent>

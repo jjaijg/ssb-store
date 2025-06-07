@@ -106,3 +106,21 @@ export async function updateOrderStatus(
     throw new Error("Failed to update order status");
   }
 }
+
+export async function updateOrderPaymentMethod(
+  orderId: string,
+  paymentMethod: "RAZORPAY" | "COD"
+) {
+  try {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        paymentMethod,
+        paymentStatus: paymentMethod === "COD" ? "PENDING" : "PENDING",
+      },
+    });
+  } catch (error) {
+    console.error("Failed to update payment method:", error);
+    throw new Error("Failed to update payment method");
+  }
+}
