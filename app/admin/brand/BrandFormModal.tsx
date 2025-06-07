@@ -43,13 +43,19 @@ type Props = { open: boolean; handleClose: () => void } & (
     }
 );
 
+type FormSchema = {
+  create: z.infer<typeof createBrandSchema>;
+  edit: z.infer<typeof updateBrandSchema>;
+};
+
 const BrandFormModal = (props: Props) => {
   const { open, mode, handleClose } = props;
 
   const [isPending, startTransition] = useTransition();
 
-  const { watch, ...form } = useForm({
+  const { watch, ...form } = useForm<FormSchema[typeof mode]>({
     defaultValues: {
+      id: mode === "edit" ? props.brand.id : undefined,
       name: mode === "edit" ? props.brand.name : "",
       slug: mode === "edit" ? props.brand.slug : "",
       description: mode === "edit" ? props.brand.description ?? "" : "",
@@ -187,7 +193,7 @@ const BrandFormModal = (props: Props) => {
                     // ClientUploadedFileData<{
                     //     uploadedBy: string;
                     // }></UploadButton>
-                    form.setValue("logoUrl", res[0].ufsUrl, {
+                    setValue("logoUrl", res[0].ufsUrl, {
                       shouldValidate: true,
                     });
                   }}
@@ -221,7 +227,7 @@ const BrandFormModal = (props: Props) => {
                   )}
                   {!brandImage && (
                     <Typography variant="body2" color="textSecondary">
-                      No brand image uploaded.
+                      No brand logo uploaded.
                     </Typography>
                   )}
                   {form.formState.errors.logoUrl && (

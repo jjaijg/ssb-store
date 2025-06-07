@@ -3,27 +3,34 @@ import {
   createCategoryAction,
   updateCategoryAction,
 } from "@/lib/actions/category.actions";
+import { deleteUploadThingFile } from "@/lib/actions/uploadthing.actions";
+import { UploadButton } from "@/lib/uploadthing";
 import {
   createCategorySchema,
   updateCategorySchema,
 } from "@/lib/validationSchema/category.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Alert,
   Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Snackbar,
+  IconButton,
+  Paper,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Category } from "@prisma/client";
-import React, { useEffect, useState, useTransition } from "react";
+import Image from "next/image";
+import React, { useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import slugify from "slugify";
+import { z } from "zod";
 
 type Props = { open: boolean; handleClose: () => void } & (
   | {
@@ -36,52 +43,78 @@ type Props = { open: boolean; handleClose: () => void } & (
     }
 );
 
+type FormSchema = {
+  create: z.infer<typeof createCategorySchema>;
+  edit: z.infer<typeof updateCategorySchema>;
+};
+
 const CategoryFormModal = (props: Props) => {
   const { open, mode, handleClose } = props;
 
-  const [result, setResult] = useState({ success: false, message: "" });
   const [isPending, startTransition] = useTransition();
 
-  const { watch, ...form } = useForm({
+  const { watch, ...form } = useForm<FormSchema[typeof mode]>({
     defaultValues: {
+      id: mode === "edit" ? props.category.id : undefined,
       name: mode === "edit" ? props.category.name : "",
       slug: mode === "edit" ? props.category.slug : "",
       description: mode === "edit" ? props.category.description ?? "" : "",
+      image: mode === "edit" ? props.category.image ?? undefined : undefined,
     },
     resolver: zodResolver(
       mode === "create" ? createCategorySchema : updateCategorySchema
     ),
   });
 
+  const { setValue } = form;
+
   const name = watch("name");
+  const catImage = watch("image");
 
   useEffect(() => {
-    form.setValue(
+    setValue(
       "slug",
       slugify(name, {
         lower: true,
         strict: true,
-      })
+      }),
+      { shouldValidate: true }
     );
-  }, [form, name]);
+  }, [setValue, name]);
 
-  const handleSubmit = () => {
+  const handleCategoryImageDelete = async () => {
+    if (catImage) {
+      // Delete the banner image from the server if needed
+      await deleteUploadThingFile(catImage);
+      // Clear the banner image
+      setValue("image", "");
+    }
+  };
+
+  const handleSubmit = async (data: unknown) => {
+    if (isPending) return;
+    if (!form.formState.isValid) return;
+
     startTransition(async () => {
-      const data = form.getValues();
       let result = {
         success: false,
         message: "",
       };
       // Here you would typically send the data to your API or perform some action
       if (mode === "create") {
-        result = await createCategoryAction(data);
+        result = await createCategoryAction(
+          data as z.infer<typeof createCategorySchema>
+        );
       } else if (mode === "edit") {
-        result = await updateCategoryAction(props.id, data);
+        result = await updateCategoryAction(
+          props.id,
+          data as z.infer<typeof updateCategorySchema>
+        );
       }
 
-      setResult(result);
-
+      if (!result.success) toast.error(result.message);
       if (result.success) {
+        toast.success(result.message);
         form.reset();
         handleClose();
       }
@@ -107,7 +140,12 @@ const CategoryFormModal = (props: Props) => {
           {mode === "create" ? "Create" : "Edit"} Category
         </DialogTitle>
         <DialogContent>
-          <Box component={"form"} width={"100%"} mt={2}>
+          <Box
+            component={"form"}
+            width={"100%"}
+            mt={2}
+            onSubmit={form.handleSubmit(handleSubmit)}
+          >
             <Stack spacing={2}>
               <TextField
                 fullWidth
@@ -116,15 +154,18 @@ const CategoryFormModal = (props: Props) => {
                 {...form.register("name")}
                 autoFocus
                 required
+                error={!!form.formState.errors.name}
+                helperText={form.formState.errors.name?.message}
               />
               <TextField
                 fullWidth
                 label="Slug"
                 type="text"
                 {...form.register("slug")}
-                helperText="Slug will be auto-generated if left empty."
                 autoComplete="off"
                 required
+                error={!!form.formState.errors.slug}
+                helperText={form.formState.errors.slug?.message}
               />
               <TextField
                 fullWidth
@@ -132,6 +173,62 @@ const CategoryFormModal = (props: Props) => {
                 type="text"
                 {...form.register("description")}
               />
+              <Box component={Paper} sx={{ p: 2 }}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Category Image
+                </Typography>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                  Upload a category image. Recommended sizes are 200x200,
+                  300x300 or 400x400 pixels. The image will be displayed in the
+                  featured categories.
+                </Typography>
+                <UploadButton
+                  disabled={isPending || !!catImage}
+                  className="upload-button"
+                  endpoint={"imageUploader"}
+                  onClientUploadComplete={(res) => {
+                    // ClientUploadedFileData<{
+                    //     uploadedBy: string;
+                    // }></UploadButton>
+                    setValue("image", res[0].ufsUrl, {
+                      shouldValidate: true,
+                    });
+                  }}
+                  onUploadError={(error) => {
+                    toast.error("Failed to upload image: " + error.message);
+                  }}
+                />
+                <Stack direction="row" spacing={1} mt={2}>
+                  {catImage && (
+                    <Box position={"relative"}>
+                      <Image
+                        src={catImage}
+                        alt="Category Image"
+                        width={"300"}
+                        height={"300"}
+                        style={{ maxWidth: "100%", height: "auto" }}
+                      />
+                      <IconButton
+                        color="error"
+                        onClick={handleCategoryImageDelete}
+                        style={{
+                          position: "absolute",
+                          top: 8,
+                          right: 8,
+                          zIndex: 1,
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  )}
+                  {!catImage && (
+                    <Typography variant="body2" color="textSecondary">
+                      No category image uploaded.
+                    </Typography>
+                  )}
+                </Stack>
+              </Box>
             </Stack>
             <DialogActions sx={{ px: 0, mt: 2 }}>
               <Button
@@ -147,7 +244,6 @@ const CategoryFormModal = (props: Props) => {
                 variant="contained"
                 color="primary"
                 disabled={isPending}
-                onClick={handleSubmit}
               >
                 {isPending
                   ? "Submitting..."
@@ -159,23 +255,6 @@ const CategoryFormModal = (props: Props) => {
           </Box>
         </DialogContent>
       </Dialog>
-      {result.message && (
-        <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          open={Boolean(result.message)}
-          onClose={() => setResult({ success: false, message: "" })}
-          message={result.message}
-          autoHideDuration={5000}
-        >
-          <Alert
-            onClose={() => setResult({ success: false, message: "" })}
-            severity={result.success ? "success" : "error"}
-            sx={{ width: "100%" }}
-          >
-            {result.message}
-          </Alert>
-        </Snackbar>
-      )}
     </>
   );
 };

@@ -38,7 +38,7 @@ export const createCategoryAction = async (data: {
       // If the user is not authenticated or does not have the ADMIN role
       return {
         success: false,
-        message: "You must be logged in to create a category.",
+        message: "Unauthorized access",
       };
     }
 
@@ -77,7 +77,7 @@ export const updateCategoryAction = async (
       // If the user is not authenticated or does not have the ADMIN role
       return {
         success: false,
-        message: "You must be logged in to update a category.",
+        message: "Unauthorized action",
       };
     }
 
@@ -103,6 +103,32 @@ export const updateCategoryAction = async (
 
 export const deleteCategoryAction = async (id: string) => {
   try {
+    // get session
+    const session = await auth();
+    if (session?.user.role !== "ADMIN") {
+      // If the user is not authenticated or does not have the ADMIN role
+      return {
+        success: false,
+        message: "Unauthorized action",
+      };
+    }
+
+    const category = await prisma.category.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        products: true,
+      },
+    });
+
+    if (!category) return { success: false, message: "Category not found" };
+    if (category.products.length)
+      return {
+        success: false,
+        message: "Category is mapped to one or more prodcuts, can't be deleted",
+      };
+
     // Delete the category by ID
     await prisma.category.delete({
       where: { id },

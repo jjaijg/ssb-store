@@ -38,7 +38,7 @@ export const createBrandAction = async (data: {
       // If the user is not authenticated or does not have the ADMIN role
       return {
         success: false,
-        message: "You must be logged in to create a brand.",
+        message: "Unauthorized access",
       };
     }
 
@@ -77,7 +77,7 @@ export const updateBrandAction = async (
       // If the user is not authenticated or does not have the ADMIN role
       return {
         success: false,
-        message: "You must be logged in to update a brand.",
+        message: "Unauthorized action",
       };
     }
 
@@ -103,6 +103,16 @@ export const updateBrandAction = async (
 
 export const deleteBrandAction = async (id: string) => {
   try {
+    // get session
+    const session = await auth();
+    if (session?.user.role !== "ADMIN") {
+      // If the user is not authenticated or does not have the ADMIN role
+      return {
+        success: false,
+        message: "Unauthorized action",
+      };
+    }
+
     const brand = await prisma.brand.findUnique({
       where: {
         id,
