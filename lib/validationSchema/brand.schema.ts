@@ -13,7 +13,7 @@ export const createBrandSchema = z.object({
     .string()
     .max(200, { message: "Description must not exceed 200 characters" })
     .optional(),
-  logoUrl: z.string().url({ message: "Image must be a valid URL" }).optional(),
+  logoUrl: z.string().url({ message: "Brand logo is required" }),
 });
 
 export const updateBrandSchema = createBrandSchema.extend({

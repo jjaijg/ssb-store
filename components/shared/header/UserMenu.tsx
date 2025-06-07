@@ -89,6 +89,14 @@ const UserMenu = () => {
           </ListItemIcon>
           <Link href="/user/orders">Order history</Link>
         </MenuItem>
+        {session.user.role === "ADMIN" && (
+          <MenuItem>
+            <ListItemIcon>
+              <HistoryIcon fontSize="small" />
+            </ListItemIcon>
+            <Link href="/admin/dashboard">Admin</Link>
+          </MenuItem>
+        )}
         <Divider />
         <Button
           color="inherit"

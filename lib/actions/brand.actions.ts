@@ -103,6 +103,22 @@ export const updateBrandAction = async (
 
 export const deleteBrandAction = async (id: string) => {
   try {
+    const brand = await prisma.brand.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        products: true,
+      },
+    });
+
+    if (!brand) return { success: false, message: "Brand not found" };
+    if (brand.products.length)
+      return {
+        success: false,
+        message: "Brand is mapped to one or more prodcuts, can't be deleted",
+      };
+
     // Delete the brand by ID
     await prisma.brand.delete({
       where: { id },
