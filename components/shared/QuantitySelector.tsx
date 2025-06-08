@@ -54,16 +54,20 @@ export default function QuantitySelector({
     }
   };
 
+  const noStock = variant.stock <= 0;
+
   return quantity === 0 ? (
     <>
       <Stack direction="row" alignItems="center" spacing={2}>
-        {showLabel ? (
+        {showLabel || noStock ? (
           <Button
             variant="contained"
-            startIcon={<ShoppingCart />}
+            color={!noStock ? "primary" : "error"}
+            startIcon={!noStock ? <ShoppingCart /> : undefined}
+            disabled={noStock}
             onClick={() => handleQuantityChange(quantity + 1, "add")}
           >
-            {"Add to cart"}
+            {!noStock ? "Add to cart" : "Out of stock"}
           </Button>
         ) : (
           <IconButton
@@ -75,7 +79,7 @@ export default function QuantitySelector({
             <ShoppingCart />
           </IconButton>
         )}
-        {lowStockWarning && variant.stock <= lowStockWarning && (
+        {lowStockWarning && !noStock && variant.stock <= lowStockWarning && (
           <Chip label={`Only ${variant.stock} left`} color="warning" />
         )}
       </Stack>
