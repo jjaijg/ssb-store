@@ -18,8 +18,9 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Link as MuiLink,
 } from "@mui/material";
-import { MoreVert } from "@mui/icons-material";
+import { MoreVert, Launch as LaunchIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { format } from "date-fns";
 import { OrderStatus } from "@prisma/client";
@@ -102,6 +103,7 @@ export default function OrdersTable({ orders }: Props) {
               <TableCell>Date</TableCell>
               {/* <TableCell>Customer</TableCell> */}
               <TableCell>Total</TableCell>
+              <TableCell>Payment Method</TableCell>
               <TableCell>Payment</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
@@ -113,13 +115,17 @@ export default function OrdersTable({ orders }: Props) {
               .map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>
-                    <Link href={`/admin/orders/${order.id}`}>
-                      {order.orderNumber}
-                    </Link>
+                    <MuiLink
+                      component={Link}
+                      href={`/admin/orders/${order.id}`}
+                    >
+                      {order.orderNumber} <LaunchIcon fontSize="small" />
+                    </MuiLink>
                   </TableCell>
                   <TableCell>{format(order.createdAt, "PPp")}</TableCell>
                   {/* <TableCell>{order.user.name}</TableCell> */}
                   <TableCell>₹{Number(order.total).toFixed(2)}</TableCell>
+                  <TableCell>{order.paymentMethod}</TableCell>
                   <TableCell>
                     <Chip
                       label={order.paymentStatus}
