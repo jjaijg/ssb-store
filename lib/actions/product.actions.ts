@@ -1,6 +1,5 @@
 "use server";
 
-import { z } from "zod";
 import { prisma } from "../prisma";
 import {
   createProductSchema,
@@ -15,13 +14,18 @@ import {
 } from "@/types";
 import { revalidatePath } from "next/cache";
 import { deleteUploadThingFile } from "./uploadthing.actions";
+import { z } from "zod";
 
 export const getProductBySlug = async (slug: string) => {
   try {
     const product = await prisma.product.findFirst({
       where: { slug },
       include: {
-        variants: true,
+        variants: {
+          orderBy: {
+            value: "asc",
+          },
+        },
         category: true,
         brand: true,
       },
@@ -54,28 +58,6 @@ export const getAllProductsWithVariants = async () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return { success: false, message: "Failed to fetch products" };
-  }
-};
-
-export const getProductswithVariants = async ({
-  limit = 2,
-}: {
-  limit: number;
-}) => {
-  try {
-    const products = await prisma.product.findMany({
-      include: {
-        variants: true,
-        category: true,
-        brand: true,
-      },
-      take: limit,
-    });
-
-    return convertToPlainObject<SerializedProductWithVariants[]>(products);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    return [] as SerializedProductWithVariants[];
   }
 };
 
@@ -257,7 +239,7 @@ export const getFeaturedProducts = async ({
       include: {
         variants: {
           where: { isActive: true },
-          orderBy: { isDefault: "desc" },
+          orderBy: { value: "asc" },
         },
         brand: {
           select: {

@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { getAdminOrderDetailsById } from "@/lib/actions/order.actions";
 import {
   Box,
+  Button,
   Chip,
   Container,
   Divider,
@@ -9,11 +10,13 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+import { ArrowLeft as ArrowLeftIcon } from "@mui/icons-material";
 import { format } from "date-fns";
 import { redirect } from "next/navigation";
 import React from "react";
 import OrderItems from "./OrderItems";
 import OrderStatusUpdate from "./OrderStatusUpdate";
+import Link from "next/link";
 
 type Props = {
   params: Promise<{
@@ -36,6 +39,15 @@ const AdminOrderdetailsPage = async ({ params }: Props) => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
+        {/* Back to product button */}
+        <Button
+          LinkComponent={Link}
+          href={`/admin/orders`}
+          startIcon={<ArrowLeftIcon />}
+          sx={{ mb: 2 }}
+        >
+          Back to orders
+        </Button>
         <Grid container spacing={3}>
           {/* Order Header */}
           <Grid size={{ xs: 12 }}>

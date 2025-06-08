@@ -1,11 +1,19 @@
 import { auth } from "@/auth";
 import ProductVariantsTable from "@/components/shared/admin/products/ProductVariantsTable";
 import { getProductVariantsByProductId } from "@/lib/actions/productVariant.actions";
-import { Alert, Box, Button, Fab, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Breadcrumbs,
+  Fab,
+  Typography,
+  Link as MuiLink,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import { Home as HomeIcon } from "@mui/icons-material";
 import Link from "next/link";
 import React from "react";
+import { getProductById } from "@/lib/actions/product.actions";
 
 type Props = {
   params: Promise<{ productId: string }>;
@@ -19,18 +27,56 @@ const ProductVariantsPage = async ({ params }: Props) => {
 
   const { productId } = await params;
 
+  const product = await getProductById(productId);
+
+  if (!product) throw new Error("Product not found");
+
   const { success, variants } = await getProductVariantsByProductId(productId);
 
   return (
     <Box component={"section"} width="100%" padding={2}>
       {/* Back to product button */}
-      <Button
+      {/* <Button
         LinkComponent={Link}
         href={`/admin/products`}
         startIcon={<ArrowLeftIcon />}
       >
         Back to products
-      </Button>
+      </Button> */}
+
+      {/* Breadcrumbs */}
+      <Breadcrumbs aria-label="Breadcrumbs">
+        <MuiLink component={Link} underline="hover" color="inherit" href="/">
+          <HomeIcon />
+        </MuiLink>
+        <MuiLink
+          component={Link}
+          underline="hover"
+          color="text.primary"
+          href={`/admin/products`}
+          aria-current="page"
+        >
+          products
+        </MuiLink>
+        <MuiLink
+          component={Link}
+          underline="none"
+          color="text.primary"
+          href={`#`}
+          // aria-current="page"
+        >
+          {product.name}
+        </MuiLink>
+        <MuiLink
+          component={Link}
+          underline="hover"
+          color="text.primary"
+          href={`/admin/products/variants/${productId}`}
+          aria-current="page"
+        >
+          Variants
+        </MuiLink>
+      </Breadcrumbs>
       {/* Heading */}
       <Typography variant="h4" gutterBottom mt={2}>
         {variants && variants.length > 0 ? variants[0].product.name : `Product`}{" "}

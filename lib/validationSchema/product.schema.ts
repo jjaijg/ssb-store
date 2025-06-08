@@ -30,20 +30,21 @@ const validateDiscount = (data: {
   return false;
 };
 
-export const createProductSchema = z.object({
+// Base schema for common fields
+const baseProductSchema = z.object({
   name: z
     .string()
-    .min(3, { message: "Product name must be at least 3 characters long" })
-    .max(50, { message: "Product name must not exceed 50 characters" }),
+    .min(1, { message: "Name is required" })
+    .max(100, { message: "Name must not exceed 100 characters" }),
   slug: z
     .string()
-    .min(2, { message: "Slug must be at least 2 characters long" })
+    .min(1, { message: "Slug is required" })
     .max(100, { message: "Slug must not exceed 100 characters" }),
   description: z
     .string()
     .max(500, { message: "Description must not exceed 500 characters" })
     .optional(),
-  isFeatured: z.boolean().default(false),
+  isFeatured: z.boolean(),
   status: z.enum([Status.ACTIVE, Status.DISCONTINUED, Status.INACTIVE], {
     required_error: "Status is required",
   }),
@@ -52,9 +53,19 @@ export const createProductSchema = z.object({
   brandId: z.string().min(1, { message: "Brand ID is required" }),
 });
 
-export const updateProductSchema = createProductSchema.extend({
+// Create schema (with ID optional)
+export const createProductSchema = baseProductSchema;
+// Update schema (with ID)
+export const updateProductSchema = baseProductSchema.extend({
   id: z.string().min(1, { message: "Product ID is required" }),
 });
+
+// export const productSchema = z.discriminatedUnion("id", [
+//   updateProductSchema,
+//   createProductSchema,
+// ]);
+
+// export type ProductSchema = z.infer<typeof productSchema>;
 
 // Product variant schema
 export const productVariantSchema = z.object({

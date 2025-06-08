@@ -20,7 +20,7 @@ export const getProductVariantsByProductId = async (productId: string) => {
         product: true, // Include product information
       },
       orderBy: {
-        variantName: "asc", // Order by variant name
+        value: "asc", // Order by variant value
       },
     });
 

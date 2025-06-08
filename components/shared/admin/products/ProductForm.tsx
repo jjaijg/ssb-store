@@ -35,6 +35,7 @@ import {
 import { useRouter } from "next/navigation";
 import { SerializedProduct } from "@/types";
 import { deleteUploadThingFile } from "@/lib/actions/uploadthing.actions";
+import { z } from "zod";
 
 type Props = {
   categories: Category[];
@@ -50,41 +51,65 @@ type Props = {
     }
 );
 
+type CreateProduct = z.infer<typeof createProductSchema>;
+type UpdateProduct = z.infer<typeof updateProductSchema>;
+
+type Formschema = {
+  create: CreateProduct;
+  edit: UpdateProduct;
+};
+
 const ProductForm = (props: Props) => {
   const { mode } = props;
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const { watch, ...form } = useForm({
-    defaultValues: {
-      name: mode === "edit" ? props.product.name : "",
-      slug: mode === "edit" ? props.product.slug : "",
-      description: mode === "edit" ? props.product.description ?? "" : "",
-      categoryId: mode === "edit" ? props.product.categoryId : "",
-      brandId: mode === "edit" ? props.product.brandId : "",
-      isFeatured: mode === "edit" ? props.product.isFeatured : false,
-      status: mode === "edit" ? props.product.status : Status.ACTIVE,
-      bannerImage: mode === "edit" ? props.product.bannerImage ?? "" : "",
-    },
+  const { watch, ...form } = useForm<Formschema[typeof mode]>({
     resolver: zodResolver(
-      mode === "create" ? createProductSchema : updateProductSchema
+      mode === "edit" ? updateProductSchema : createProductSchema
     ),
+    defaultValues:
+      mode === "edit"
+        ? {
+            id: props.product.id,
+            name: props.product.name,
+            slug: props.product.slug,
+            description: props.product.description ?? "",
+            categoryId: props.product.categoryId,
+            brandId: props.product.brandId,
+            isFeatured: Boolean(props.product.isFeatured),
+            status: props.product.status,
+            bannerImage: props.product.bannerImage ?? "",
+          }
+        : {
+            name: "",
+            slug: "",
+            description: "",
+            categoryId: "",
+            brandId: "",
+            isFeatured: false,
+            status: Status.ACTIVE,
+            bannerImage: "",
+          },
     mode: "onChange",
   });
+
+  const { setValue } = form;
 
   const name = watch("name");
   const bannerImage = watch("bannerImage");
 
   useEffect(() => {
-    form.setValue(
+    setValue(
       "slug",
       slugify(name, {
         lower: true,
         strict: true,
-      })
+      }),
+      { shouldValidate: true }
     );
-  }, [form, name]);
+  }, [setValue, name]);
 
   const handlebannerImageDelete = async () => {
     if (bannerImage) {
@@ -95,16 +120,13 @@ const ProductForm = (props: Props) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (data: unknown) => {
+    if (isPending || !form.formState.isValid) return;
     startTransition(async () => {
-      const data = form.getValues();
-      // Here you would typically send the data to your API or perform some action
       if (mode === "create") {
-        const result = await createProductWithoutVariants({
-          ...data,
-          isFeatured: !!data.isFeatured,
-          bannerImage: data.bannerImage || undefined,
-        });
+        const result = await createProductWithoutVariants(
+          data as CreateProduct
+        );
         if (result.success) {
           toast.success("Product created successfully!");
           router.push("/admin/products");
@@ -113,12 +135,10 @@ const ProductForm = (props: Props) => {
           toast.error(result.message || "Failed to create product");
         }
       } else if (mode === "edit") {
-        const result = await updateProductWithoutVariants(props.id, {
-          ...data,
-          id: props.id,
-          isFeatured: !!data.isFeatured,
-          bannerImage: data.bannerImage || undefined,
-        });
+        const result = await updateProductWithoutVariants(
+          props.id,
+          data as UpdateProduct
+        );
         if (result.success) {
           toast.success("Product updated successfully!");
           form.reset();
@@ -132,7 +152,12 @@ const ProductForm = (props: Props) => {
 
   return (
     <>
-      <Box component={"form"} width={"100%"} mt={2}>
+      <Box
+        component={"form"}
+        width={"100%"}
+        mt={2}
+        onSubmit={form.handleSubmit(handleSubmit)}
+      >
         <Stack spacing={2}>
           <Stack
             direction={{
@@ -358,7 +383,7 @@ const ProductForm = (props: Props) => {
           <Button
             color="error"
             variant="outlined"
-            disabled={isPending}
+            disabled={isPending || form.formState.isSubmitting}
             onClick={() => router.back()}
           >
             Cancel
@@ -367,8 +392,7 @@ const ProductForm = (props: Props) => {
             type="submit"
             variant="contained"
             color="primary"
-            disabled={isPending}
-            onClick={handleSubmit}
+            disabled={isPending || form.formState.isSubmitting}
           >
             {isPending
               ? "Submitting..."

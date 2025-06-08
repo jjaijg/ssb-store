@@ -97,7 +97,7 @@ const ProductVariantsTable = ({ variants }: Props) => {
                   <AvatarGroup max={4} spacing={"small"}>
                     {variant.images.map((img) => (
                       <Avatar
-                        key={variant.variantName}
+                        key={img}
                         alt={variant.variantName}
                         src={img}
                         sx={{ border: "2px solid #0030499e !important" }}
