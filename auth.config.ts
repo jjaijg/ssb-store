@@ -5,14 +5,12 @@ import { NextResponse } from "next/server";
 const PROTECTED_ROUTES = {
   authenticated: [
     /^\/profile/,
-    /^\/shipping-address/,
-    /^\/payment-method/,
-    /^\/place-order/,
+    /^\/checkout\/(.*)/,
     /^\/user\/(.*)/,
     /^\/order\/(.*)/,
   ],
   admin: [/^\/admin\/(.*)/],
-  public: [/^\/signin/, /^\/signup/],
+  public: [/^\/signin/, /^\/signup/, /^\/forgot-password/],
 } as const;
 
 export const authConfig = {

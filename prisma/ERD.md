@@ -148,6 +148,8 @@ erDiagram
   Role role
   String phone "nullable"
   String password "nullable"
+  DateTime lastPasswordReset "nullable"
+  Int passwordAttempts
   DateTime createdAt
   DateTime updatedAt
 }
@@ -361,6 +363,8 @@ erDiagram
   - `role`: 
   - `phone`: 
   - `password`: 
+  - `lastPasswordReset`: 
+  - `passwordAttempts`: 
   - `createdAt`: 
   - `updatedAt`: 
 

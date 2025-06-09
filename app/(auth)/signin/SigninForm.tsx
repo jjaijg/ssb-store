@@ -9,7 +9,7 @@ import {
 import NextLink from "next/link";
 import React, { useState } from "react";
 import SigninButton from "./SigninButton";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signinFormSchema } from "@/lib/validationSchema/user.schema";
 import { signIn } from "next-auth/react";
 
@@ -18,6 +18,7 @@ const SigninForm = () => {
     success: false,
     message: "",
   });
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -38,16 +39,15 @@ const SigninForm = () => {
       });
 
       // Sign in the user
-      await signIn("credentials", {
+      const resp = await signIn("credentials", {
         ...user,
-        redirect: true,
-        redirectTo: callbackUrl,
+        redirect: false,
       });
       setResult({
-        success: true,
-        message: "Sign in successful",
+        success: !resp?.error,
+        message: !resp?.error ? "Sign in successful" : "Invalid credentials",
       });
-      // router.refresh();
+      if (resp?.ok && !resp.error) router.push(callbackUrl);
     } catch (error) {
       console.error("Error during sign-in:", error);
       setResult({
@@ -77,6 +77,16 @@ const SigninForm = () => {
           size="medium"
         />
         <SigninButton />
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <MuiLink
+            component={NextLink}
+            href="/forgot-password"
+            underline="hover"
+            variant="body2"
+          >
+            Forgot Password?
+          </MuiLink>
+        </Box>
 
         {!result.success && result.message && (
           <Typography
